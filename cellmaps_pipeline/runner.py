@@ -1,23 +1,29 @@
 #! /usr/bin/env python
 
+import os
 import logging
+import time
+from cellmaps_utils import cellmaps_io
+import cellmaps_pipeline
+from cellmaps_pipeline.exceptions import CellmapsPipelineError
 
 
 logger = logging.getLogger(__name__)
 
 
-class CellmapspipelineRunner(object):
+class CellmapsPipelineRunner(object):
     """
     Class to run algorithm
     """
-    def __init__(self, exitcode):
+    def __init__(self, outdir=None):
         """
         Constructor
 
-        :param exitcode: value to return via :py:meth:`.CellmapspipelineRunner.run` method
+        :param exitcode: value to return via :py:meth:`.CellmapsPipelineRunner.run` method
         :type int:
         """
-        self._exitcode = exitcode
+        self._outdir = outdir
+        self._start_time = int(time.time())
         logger.debug('In constructor')
 
     def run(self):
@@ -28,4 +34,23 @@ class CellmapspipelineRunner(object):
         :return:
         """
         logger.debug('In run method')
-        return self._exitcode
+        if self._outdir is None:
+            raise CellmapsPipelineError('outdir must be set')
+
+        if not os.path.isdir(self._outdir):
+            os.makedirs(self._outdir, mode=0o755)
+
+        cellmaps_io.setup_filelogger(outdir=self._outdir,
+                                     handlerprefix='cellmaps_pipeline')
+        cellmaps_io.write_task_start_json(outdir=self._outdir,
+                                          start_time=self._start_time,
+                                          version=cellmaps_pipeline.__version__)
+
+        exit_status = 99
+        try:
+            exit_status = 0
+        finally:
+            cellmaps_io.write_task_finish_json(outdir=self._outdir,
+                                               start_time=self._start_time,
+                                               status=exit_status)
+        return exit_status

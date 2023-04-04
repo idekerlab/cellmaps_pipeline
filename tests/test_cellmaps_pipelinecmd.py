@@ -22,18 +22,18 @@ class TestCellmaps_pipeline(unittest.TestCase):
 
     def test_parse_arguments(self):
         """Tests parse arguments"""
-        res = cellmaps_pipelinecmd._parse_arguments('hi', [])
+        res = cellmaps_pipelinecmd._parse_arguments('hi', ['outdir'])
 
         self.assertEqual(res.verbose, 0)
-        self.assertEqual(res.exitcode, 0)
+        self.assertEqual('outdir', res.outdir)
         self.assertEqual(res.logconf, None)
 
-        someargs = ['-vv', '--logconf', 'hi', '--exitcode', '3']
+        someargs = ['-vv', '--logconf', 'hi', 'outdir']
         res = cellmaps_pipelinecmd._parse_arguments('hi', someargs)
 
         self.assertEqual(res.verbose, 2)
         self.assertEqual(res.logconf, 'hi')
-        self.assertEqual(res.exitcode, 3)
+        self.assertEqual('outdir', res.outdir)
 
     def test_setup_logging(self):
         """ Tests logging setup"""
@@ -44,7 +44,7 @@ class TestCellmaps_pipeline(unittest.TestCase):
             pass
 
         # args.logconf is None
-        res = cellmaps_pipelinecmd._parse_arguments('hi', [])
+        res = cellmaps_pipelinecmd._parse_arguments('hi', ['outdir'])
         cellmaps_pipelinecmd._setup_logging(res)
 
         # args.logconf set to a file
@@ -76,7 +76,8 @@ args=(sys.stderr,)
 format=%(asctime)s %(name)-12s %(levelname)-8s %(message)s""")
 
             res = cellmaps_pipelinecmd._parse_arguments('hi', ['--logconf',
-                                                                       logfile])
+                                                                       logfile,
+                                                               'outdir'])
             cellmaps_pipelinecmd._setup_logging(res)
 
         finally:
@@ -88,7 +89,7 @@ format=%(asctime)s %(name)-12s %(levelname)-8s %(message)s""")
         # try where loading config is successful
         try:
             temp_dir = tempfile.mkdtemp()
-            res = cellmaps_pipelinecmd.main(['myprog.py'])
+            res = cellmaps_pipelinecmd.main(['myprog.py', 'outdir'])
             self.assertEqual(res, 0)
         finally:
             shutil.rmtree(temp_dir)

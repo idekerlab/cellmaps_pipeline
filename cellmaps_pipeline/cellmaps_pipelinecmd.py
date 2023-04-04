@@ -6,7 +6,7 @@ import logging
 import logging.config
 
 import cellmaps_pipeline
-from cellmaps_pipeline.runner import CellmapspipelineRunner
+from cellmaps_pipeline.runner import CellmapsPipelineRunner
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +38,13 @@ def _parse_arguments(desc, args):
     """
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=Formatter)
+    parser.add_argument('outdir', help='Output directory')
     parser.add_argument('--logconf', default=None,
                         help='Path to python logging configuration file in '
                              'this format: https://docs.python.org/3/library/'
                              'logging.config.html#logging-config-fileformat '
                              'Setting this overrides -v parameter which uses '
                              ' default logger. (default None)')
-    parser.add_argument('--exitcode', help='Exit code this command will return',
-                        default=0, type=int)
     parser.add_argument('--verbose', '-v', action='count', default=0,
                         help='Increases verbosity of logger to standard '
                              'error for log messages in this module. Messages are '
@@ -90,14 +89,14 @@ def main(args):
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list
 
-    :return: return value of :py:meth:`cellmaps_pipeline.runner.CellmapspipelineRunner.run`
+    :return: return value of :py:meth:`cellmaps_pipeline.runner.CellmapsPipelineRunner.run`
              or ``2`` if an exception is raised
     :rtype: int
     """
     desc = """
     Version {version}
 
-    Invokes run() method on CellmapspipelineRunner
+    Invokes run() method on CellmapsPipelineRunner
 
     """.format(version=cellmaps_pipeline.__version__)
     theargs = _parse_arguments(desc, args[1:])
@@ -106,7 +105,7 @@ def main(args):
 
     try:
         _setup_logging(theargs)
-        return CellmapspipelineRunner(theargs.exitcode).run()
+        return CellmapsPipelineRunner(outdir=theargs.outdir).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2

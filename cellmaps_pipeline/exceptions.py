@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-class CellmapspipelineError(Exception):
+class CellmapsPipelineError(Exception):
     """
     Base exception for cellmaps_pipeline
     """
