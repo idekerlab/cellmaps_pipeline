@@ -4,25 +4,17 @@ import argparse
 import sys
 import logging
 import logging.config
+import json
 
+from cellmaps_utils import logutils
+from cellmaps_utils import constants
+from cellmaps_imagedownloader.runner import CellmapsImageDownloader
+from cellmaps_ppidownloader.runner import CellmapsPPIDownloader
+from cellmaps_pipeline.runner import ProgrammaticPipelineRunner
 import cellmaps_pipeline
-from cellmaps_pipeline.runner import CellmapsPipelineRunner
+from cellmaps_pipeline.runner import CellmapsPipeline
 
 logger = logging.getLogger(__name__)
-
-
-LOG_FORMAT = "%(asctime)-15s %(levelname)s %(relativeCreated)dms " \
-             "%(filename)s::%(funcName)s():%(lineno)d %(message)s"
-
-
-class Formatter(argparse.ArgumentDefaultsHelpFormatter,
-                argparse.RawDescriptionHelpFormatter):
-    """
-    Combine two Formatters to get help and default values
-    displayed when showing help
-
-    """
-    pass
 
 
 def _parse_arguments(desc, args):
@@ -37,8 +29,44 @@ def _parse_arguments(desc, args):
     :rtype: :py:class:`argparse.Namespace`
     """
     parser = argparse.ArgumentParser(description=desc,
-                                     formatter_class=Formatter)
+                                     formatter_class=constants.ArgParseFormatter)
     parser.add_argument('outdir', help='Output directory')
+    parser.add_argument('--samples',
+                        help='CSV file with list of IF images to download '
+                             'in format of filename,if_plate_id,position,'
+                             'sample,status,locations,antibody,ensembl_ids,'
+                             'gene_names\n/archive/1/1_A1_1_,1,A1,1,35,'
+                             'Golgi apparatus,HPA000992,ENSG00000066455,GOLGA5')
+    parser.add_argument('--unique',
+                        help='CSV file of unique samples '
+                             'in format of:\n'
+                             'antibody,ensembl_ids,gene_names,atlas_name,'
+                             'locations,n_location\n'
+                             'HPA040086,ENSG00000094914,AAAS,U-2 OS,'
+                             'Nuclear membrane,1')
+    parser.add_argument('--edgelist',
+                        help='edgelist TSV file in format of:\n'
+                             'GeneID1\tSymbol1\tGeneID2\tSymbol2\n'
+                             '10159\tATP6AP2\t2\tA2M')
+    parser.add_argument('--baitlist',
+                        help='baitlist TSV file in format of:\n'
+                             'GeneSymbol\tGeneID\t# Interactors\n'
+                             '"ADA"\t"100"\t1.')
+    parser.add_argument('--model_path', type=str,
+                        help='Path to model file. A model file to download '
+                             'is here: '
+                             'https://github.com/'
+                             'CellProfiling/densenet/releases/download/'
+                             'v0.1.0/external_crop512_focal_slov_hardlog'
+                             '_class_densenet121_dropout_i768_aug2_5folds'
+                             '_fold0_final.pth')
+    parser.add_argument('--provenance',
+                        help='Path to file containing provenance '
+                             'information about input files in JSON format. '
+                             'This is required and not including will output '
+                             'and error message with example of file')
+    parser.add_argument('--fake', action='store_true',
+                        help='If set, generate fake data for every step')
     parser.add_argument('--logconf', default=None,
                         help='Path to python logging configuration file in '
                              'this format: https://docs.python.org/3/library/'
@@ -59,29 +87,6 @@ def _parse_arguments(desc, args):
     return parser.parse_args(args)
 
 
-def _setup_logging(args):
-    """
-    Sets up logging based on parsed command line arguments.
-    If args.logconf is set use that configuration otherwise look
-    at args.verbose and set logging for this module
-
-    :param args: parsed command line arguments from argparse
-    :raises AttributeError: If args is None or args.logconf is None
-    :return: None
-    """
-
-    if args.logconf is None:
-        level = (50 - (10 * args.verbose))
-        logging.basicConfig(format=LOG_FORMAT,
-                            level=level)
-        logger.setLevel(level)
-        return
-
-    # logconf was set use that file
-    logging.config.fileConfig(args.logconf,
-                              disable_existing_loggers=False)
-
-
 def main(args):
     """
     Main entry point for program
@@ -89,23 +94,75 @@ def main(args):
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list
 
-    :return: return value of :py:meth:`cellmaps_pipeline.runner.CellmapsPipelineRunner.run`
+    :return: return value of :py:meth:`cellmaps_pipeline.runner.CellmapsPipeline.run`
              or ``2`` if an exception is raised
     :rtype: int
     """
+    withguid = CellmapsPPIDownloader.get_example_provenance(with_ids=True)
+    withguid.update(CellmapsImageDownloader.get_example_provenance(with_ids=True))
+
+    register = CellmapsPPIDownloader.get_example_provenance()
+    register.update(CellmapsImageDownloader.get_example_provenance())
+
+    withguids_json = json.dumps(withguid, indent=2)
+    register_json = json.dumps(register, indent=2)
+
     desc = """
-    Version {version}
+Version {version}
 
-    Invokes run() method on CellmapsPipelineRunner
+Invokes run() method on CellmapsPipeline
 
-    """.format(version=cellmaps_pipeline.__version__)
+In addition, the --provenance flag is required and must be set to a path 
+to a JSON file. 
+
+If datasets are already registered with FAIRSCAPE then the following is sufficient:
+
+{withguids}
+
+If datasets are NOT registered, then the following is required:
+
+{register}
+
+Additional optional fields for registering datasets include 
+'url', 'used-by', 'associated-publication', and 'additional-documentation'
+    """.format(version=cellmaps_pipeline.__version__,
+               withguids=withguids_json,
+               register=register_json)
     theargs = _parse_arguments(desc, args[1:])
     theargs.program = args[0]
     theargs.version = cellmaps_pipeline.__version__
 
     try:
-        _setup_logging(theargs)
-        return CellmapsPipelineRunner(outdir=theargs.outdir).run()
+        logutils.setup_cmd_logging(theargs)
+
+        if theargs.provenance is None:
+            sys.stderr.write('\n\n--provenance flag is required to run this tool. '
+                             'Please pass '
+                             'a path to a JSON file with the following data:\n\n')
+            sys.stderr.write('If datasets are already registered with '
+                             'FAIRSCAPE then the following is sufficient:\n\n')
+            sys.stderr.write(withguids_json + '\n\n')
+            sys.stderr.write('If datasets are NOT registered, then the following is required:\n\n')
+            sys.stderr.write(register_json + '\n\n')
+            return 1
+
+        # load the provenance as a dict
+        with open(theargs.provenance, 'r') as f:
+            json_prov = json.load(f)
+
+        runner = ProgrammaticPipelineRunner(outdir=theargs.outdir,
+                                            samples=theargs.samples,
+                                            unique=theargs.unique,
+                                            edgelist=theargs.edgelist,
+                                            baitlist=theargs.baitlist,
+                                            model_path=theargs.model_path,
+                                            fake=theargs.fake,
+                                            provenance=json_prov,
+                                            input_data_dict=theargs.__dict__)
+
+        return CellmapsPipeline(outdir=theargs.outdir,
+                                runner=runner,
+                                input_data_dict=theargs.__dict__).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2

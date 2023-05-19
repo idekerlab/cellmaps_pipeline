@@ -5,7 +5,7 @@
 
 
 import unittest
-from cellmaps_pipeline.runner import CellmapsPipelineRunner
+from cellmaps_pipeline.runner import CellmapsPipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
 
 
@@ -20,14 +20,14 @@ class TestCellmapspipelinerunner(unittest.TestCase):
 
     def test_constructor(self):
         """Tests constructor"""
-        myobj = CellmapsPipelineRunner(0)
+        myobj = CellmapsPipeline(0)
 
         self.assertIsNotNone(myobj)
 
     def test_run_outdir_not_set(self):
         """ Tests run()"""
         try:
-            myobj = CellmapsPipelineRunner()
+            myobj = CellmapsPipeline()
             myobj.run()
             self.fail('expected exception')
         except CellmapsPipelineError as e:
