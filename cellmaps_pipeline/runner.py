@@ -20,6 +20,12 @@ from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 from cellmaps_image_embedding.runner import CellmapsImageEmbedder
 from cellmaps_image_embedding.runner import FakeEmbeddingGenerator
 from cellmaps_image_embedding.runner import DensenetEmbeddingGenerator
+from cellmaps_coembedding.runner import MuseCoEmbeddingGenerator
+from cellmaps_coembedding.runner import FakeCoEmbeddingGenerator
+from cellmaps_coembedding.runner import CellmapsCoEmbedder
+from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
+from cellmaps_generate_hierarchy.hierarchy import CDAPSHierarchyGenerator
+from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
@@ -82,6 +88,11 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                            constants.PPI_EMBEDDING_STEP_DIR)
         self._image_embed_dir = os.path.join(self._outdir,
                                              constants.IMAGE_EMBEDDING_STEP_DIR)
+        self._coembed_dir = os.path.join(self._outdir,
+                                         constants.COEMBEDDING_STEP_DIR)
+
+        self._hierarchy_dir = os.path.join(self._outdir,
+                                           constants.HIERARCHY_STEP_DIR)
 
     def run(self):
         """
@@ -102,7 +113,56 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         if self._embed_image() != 0:
             raise CellmapsPipelineError('Image embed failed')
+
+        if self._coembed() != 0:
+            raise CellmapsPipelineError('Coembed failed')
+
+        if self._hierarchy() != 0:
+            raise CellmapsPipelineError('Hierarchy failed')
+
         return 0
+
+    def _hierarchy(self):
+        """
+
+        :return:
+        """
+        if self._fake is True and os.path.isdir(self._hierarchy_dir):
+            warnings.warn('Found hierarchy dir, assuming we are good. skipping')
+            return 0
+
+        ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir)
+
+        hiergen = CDAPSHierarchyGenerator()
+        return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
+                                         inputdir=self._coembed_dir,
+                                         ppigen=ppigen,
+                                         hiergen=hiergen,
+                                         input_data_dict=self._input_data_dict).run()
+
+    def _coembed(self):
+        """
+
+        :return:
+        """
+        if self._fake is True and os.path.isdir(self._coembed_dir):
+            warnings.warn('Found coembedding dir, assuming we are good. skipping')
+            return 0
+
+        if self._fake:
+            gen = FakeCoEmbeddingGenerator(ppi_embeddingdir=self._ppi_embed_dir,
+                                           image_embeddingdir=self._image_embed_dir,
+                                           image_downloaddir=self._image_dir)
+        else:
+            gen = MuseCoEmbeddingGenerator(outdir=self._coembed_dir,
+                                           ppi_embeddingdir=self._ppi_embed_dir,
+                                           image_embeddingdir=self._image_embed_dir,
+                                           image_downloaddir=self._image_dir)
+        return CellmapsCoEmbedder(outdir=self._coembed_dir,
+                                  inputdirs=[self._image_embed_dir, self._ppi_embed_dir,
+                                             self._image_dir],
+                                  embedding_generator=gen,
+                                  input_data_dict=self._input_data_dict).run()
 
     def _embed_image(self):
         """
@@ -138,7 +198,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         return CellMapsPPIEmbedder(outdir=self._ppi_embed_dir,
                                    embedding_generator=gen,
-                                   ppi_downloaddir=self._ppi_dir,
+                                   inputdir=self._ppi_dir,
                                    input_data_dict=self._input_data_dict).run()
 
     def _download_ppi(self):
