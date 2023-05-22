@@ -16,23 +16,27 @@ CM4AI Pipeline
 
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package with command line
-
+Runs CM4AI pipeline
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
 
-
-
 Dependencies
 ------------
 
-* TODO add
+* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__
+* `cellmaps_imagedownloader <https://pypi.org/project/cellmaps-imagedownloader>`__
+* `cellmaps_ppidownloader <https://pypi.org/project/cellmaps-ppidownloader>`__
+* `cellmaps_image_embedding <https://pypi.org/project/cellmaps-image-embedding>`__
+* `cellmaps_ppi_embedding <https://pypi.org/project/cellmaps-ppi-embedding/>`__
+* `cellmaps_coembedding <https://pypi.org/project/cellmaps-coembedding>`__
+* `cellmaps_generate_hierarchy <https://pypi.org/project/cellmaps-generate-hierarchy>`__
+* `networkx <https://pypi.org/project/networkx>`__
 
 Compatibility
 -------------
 
-* Python 3.3+
+* Python 3.8+
 
 Installation
 ------------
