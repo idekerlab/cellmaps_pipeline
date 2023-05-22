@@ -245,6 +245,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                        imagedownloader=dloader,
                                        imagegen=imagegen,
                                        provenance=self._provenance,
+                                       skip_failed=True,
                                        input_data_dict=self._input_data_dict).run()
 
 
