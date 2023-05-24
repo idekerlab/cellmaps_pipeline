@@ -127,7 +127,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if self._fake is True and os.path.isdir(self._hierarchy_dir):
+        if os.path.isdir(self._hierarchy_dir):
             warnings.warn('Found hierarchy dir, assuming we are good. skipping')
             return 0
 
@@ -145,7 +145,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if self._fake is True and os.path.isdir(self._coembed_dir):
+        if os.path.isdir(self._coembed_dir):
             warnings.warn('Found coembedding dir, assuming we are good. skipping')
             return 0
 
@@ -169,7 +169,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if self._fake is True and os.path.isdir(self._image_embed_dir):
+        if os.path.isdir(self._image_embed_dir):
             warnings.warn('Found image embedding dir, assuming we are good. skipping')
             return 0
 
@@ -189,7 +189,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if self._fake is True and os.path.isdir(self._ppi_embed_dir):
+        if os.path.isdir(self._ppi_embed_dir):
             warnings.warn('Found ppi embedding dir, assuming we are good. skipping')
             return 0
         gen = Node2VecEmbeddingGenerator(
@@ -206,7 +206,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if self._fake is True and os.path.isdir(self._ppi_dir):
+        if os.path.isdir(self._ppi_dir):
             warnings.warn('Found ppi dir, assuming we are good. skipping')
             return 0
         apmsgen = APMSGeneNodeAttributeGenerator(
@@ -226,7 +226,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         :return: exit code of :py:meth:`~cellmaps_imagedownloader.runner.CellmapsImageDownloader.run`
         :rtype: int
         """
-        if self._fake is True and os.path.isdir(self._image_dir):
+        if os.path.isdir(self._image_dir):
             warnings.warn('Found image dir, assuming we are good. skipping')
             return 0
         logger.info('Downloading images')
