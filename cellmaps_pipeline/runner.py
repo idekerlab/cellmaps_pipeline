@@ -24,7 +24,7 @@ from cellmaps_coembedding.runner import MuseCoEmbeddingGenerator
 from cellmaps_coembedding.runner import FakeCoEmbeddingGenerator
 from cellmaps_coembedding.runner import CellmapsCoEmbedder
 from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
-from cellmaps_generate_hierarchy.hierarchy import CDAPSHierarchyGenerator
+from cellmaps_generate_hierarchy.hierarchy import CDAPSHiDeFHierarchyGenerator
 from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
 
 import cellmaps_pipeline
@@ -133,7 +133,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir)
 
-        hiergen = CDAPSHierarchyGenerator()
+        hiergen = CDAPSHiDeFHierarchyGenerator()
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
                                          inputdir=self._coembed_dir,
                                          ppigen=ppigen,

@@ -20,7 +20,7 @@ class TestCellmapspipelinerunner(unittest.TestCase):
 
     def test_constructor(self):
         """Tests constructor"""
-        myobj = CellmapsPipeline(0)
+        myobj = CellmapsPipeline('foo')
 
         self.assertIsNotNone(myobj)
 
@@ -31,4 +31,4 @@ class TestCellmapspipelinerunner(unittest.TestCase):
             myobj.run()
             self.fail('expected exception')
         except CellmapsPipelineError as e:
-            self.assertEqual('outdir must be set', str(e))
+            self.assertEqual('outdir is None', str(e))
