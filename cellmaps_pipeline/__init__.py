@@ -2,8 +2,8 @@
 
 """Top-level package for CM4AI Pipeline."""
 
-__author__ = 'Christopher Churas'
-__email__ = 'cchuras@ucsd.edu'
+__author__ = 'Ideker Lab CM4AI team'
+__email__ = 'tools@cm4ai.org'
 __version__ = '0.1.0a3'
 __repo_url__ = 'https://github.com/idekerlab/cellmaps_pipeline'
 __description__ = 'Runs full Cellmaps CM4AI pipeline'
