@@ -34,7 +34,7 @@ requirements = ['cellmaps_utils',
                 'cellmaps_ppi_embedding',
                 'cellmaps_coembedding',
                 'cellmaps_generate_hierarchy',
-                'networkx']
+                'networkx>=2.8,<2.9']
 
 setup_requirements = [ ]
 
