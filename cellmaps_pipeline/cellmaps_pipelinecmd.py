@@ -60,6 +60,12 @@ def _parse_arguments(desc, args):
                              'v0.1.0/external_crop512_focal_slov_hardlog'
                              '_class_densenet121_dropout_i768_aug2_5folds'
                              '_fold0_final.pth')
+    parser.add_argument('--fold', default=1, type=int, help='Image node attribute file fold to use')
+    parser.add_argument('--proteinatlasxml',
+                        default='https://www.proteinatlas.org/download/proteinatlas.xml.gz',
+                        help='URL or path to proteinatlas.xml or proteinatlas.xml.gz file '
+                             'used to look for images not found in the standard location '
+                             'on HPA')
     parser.add_argument('--provenance',
                         help='Path to file containing provenance '
                              'information about input files in JSON format. '
@@ -110,7 +116,7 @@ def main(args):
     desc = """
 Version {version}
 
-Invokes run() method on CellmapsPipeline
+Runs the full cellmaps pipeline
 
 In addition, the --provenance flag is required and must be set to a path 
 to a JSON file. 
@@ -156,8 +162,10 @@ Additional optional fields for registering datasets include
                                             edgelist=theargs.edgelist,
                                             baitlist=theargs.baitlist,
                                             model_path=theargs.model_path,
+                                            proteinatlasxml=theargs.proteinatlasxml,
                                             fake=theargs.fake,
                                             provenance=json_prov,
+                                            fold=theargs.fold,
                                             input_data_dict=theargs.__dict__)
 
         return CellmapsPipeline(outdir=theargs.outdir,
