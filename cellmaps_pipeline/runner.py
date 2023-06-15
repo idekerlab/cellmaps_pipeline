@@ -26,6 +26,9 @@ from cellmaps_coembedding.runner import CellmapsCoEmbedder
 from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
 from cellmaps_generate_hierarchy.hierarchy import CDAPSHiDeFHierarchyGenerator
 from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
+from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader
+from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
+from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
@@ -64,8 +67,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  edgelist=None,
                  baitlist=None,
                  model_path=None,
+                 proteinatlasxml=None,
                  fake=None,
                  provenance=None,
+                 fold=1,
                  input_data_dict=None):
         """
         Constructor
@@ -79,6 +84,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._model_path = model_path
         self._fake = fake
         self._provenance = provenance
+        self._fold = fold
+        self._proteinatlasxml = proteinatlasxml
         self._input_data_dict = input_data_dict
         self._image_dir = os.path.join(self._outdir,
                                        constants.IMAGE_DOWNLOAD_STEP_DIR)
@@ -151,16 +158,13 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         if self._fake:
             gen = FakeCoEmbeddingGenerator(ppi_embeddingdir=self._ppi_embed_dir,
-                                           image_embeddingdir=self._image_embed_dir,
-                                           image_downloaddir=self._image_dir)
+                                           image_embeddingdir=self._image_embed_dir)
         else:
             gen = MuseCoEmbeddingGenerator(outdir=self._coembed_dir,
                                            ppi_embeddingdir=self._ppi_embed_dir,
-                                           image_embeddingdir=self._image_embed_dir,
-                                           image_downloaddir=self._image_dir)
+                                           image_embeddingdir=self._image_embed_dir)
         return CellmapsCoEmbedder(outdir=self._coembed_dir,
-                                  inputdirs=[self._image_embed_dir, self._ppi_embed_dir,
-                                             self._image_dir],
+                                  inputdirs=[self._image_embed_dir, self._ppi_embed_dir],
                                   embedding_generator=gen,
                                   input_data_dict=self._input_data_dict).run()
 
@@ -178,7 +182,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         else:
             gen = DensenetEmbeddingGenerator(self._image_dir,
                                              outdir=self._image_embed_dir,
-                                             model_path=self._model_path)
+                                             model_path=self._model_path,
+                                             fold=self._fold)
         return CellmapsImageEmbedder(outdir=self._image_embed_dir,
                                      inputdir=self._image_dir,
                                      embedding_generator=gen,
@@ -230,9 +235,15 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             warnings.warn('Found image dir, assuming we are good. skipping')
             return 0
         logger.info('Downloading images')
+
         imagegen = ImageGeneNodeAttributeGenerator(
             unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique),
             samples_list=ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples))
+
+        proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
+        proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
+        imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
+                                                  samples_list=imagegen.get_samples_list())
 
         if self._fake is True:
             warnings.warn('FAKE IMAGES ARE BEING DOWNLOADED!!!!!')
@@ -244,6 +255,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         return CellmapsImageDownloader(outdir=self._image_dir,
                                        imagedownloader=dloader,
                                        imagegen=imagegen,
+                                       imageurlgen=imageurlgen,
                                        provenance=self._provenance,
                                        skip_failed=True,
                                        input_data_dict=self._input_data_dict).run()
