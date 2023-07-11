@@ -66,6 +66,14 @@ def _parse_arguments(desc, args):
                         help='URL or path to proteinatlas.xml or proteinatlas.xml.gz file '
                              'used to look for images not found in the standard location '
                              'on HPA')
+    parser.add_argument('--ppi_cutoffs', nargs='+', type=float,
+                        default=[0.001, 0.002, 0.003, 0.004, 0.005, 0.006,
+                                 0.007, 0.008, 0.009, 0.01, 0.02, 0.03,
+                                 0.04, 0.05, 0.10],
+                        help='Cutoffs used to generate PPI input networks. For example, '
+                             'a value of 0.1 means to generate PPI input network using the '
+                             'top ten percent of coembedding entries. Each cutoff generates '
+                             'another PPI network')
     parser.add_argument('--provenance',
                         help='Path to file containing provenance '
                              'information about input files in JSON format. '
@@ -163,6 +171,7 @@ Additional optional fields for registering datasets include
                                             baitlist=theargs.baitlist,
                                             model_path=theargs.model_path,
                                             proteinatlasxml=theargs.proteinatlasxml,
+                                            ppi_cutoffs=theargs.ppi_cutoffs,
                                             fake=theargs.fake,
                                             provenance=json_prov,
                                             fold=theargs.fold,

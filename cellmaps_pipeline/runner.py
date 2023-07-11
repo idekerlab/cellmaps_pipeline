@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 import os
-import sys
 import warnings
 import logging
 import time
@@ -25,6 +24,7 @@ from cellmaps_coembedding.runner import FakeCoEmbeddingGenerator
 from cellmaps_coembedding.runner import CellmapsCoEmbedder
 from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
 from cellmaps_generate_hierarchy.hierarchy import CDAPSHiDeFHierarchyGenerator
+from cellmaps_generate_hierarchy.maturehierarchy import HiDeFHierarchyRefiner
 from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
@@ -68,6 +68,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  baitlist=None,
                  model_path=None,
                  proteinatlasxml=None,
+                 ppi_cutoffs=None,
                  fake=None,
                  provenance=None,
                  fold=1,
@@ -86,6 +87,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._provenance = provenance
         self._fold = fold
         self._proteinatlasxml = proteinatlasxml
+        self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
         self._image_dir = os.path.join(self._outdir,
                                        constants.IMAGE_DOWNLOAD_STEP_DIR)
@@ -138,14 +140,19 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             warnings.warn('Found hierarchy dir, assuming we are good. skipping')
             return 0
 
-        ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir)
+        ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir,
+                                              cutoffs=self._ppi_cutoffs)
 
-        hiergen = CDAPSHiDeFHierarchyGenerator()
+        refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance)
+
+        hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
+                                               provenance_utils=self._provenance)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
                                          inputdir=self._coembed_dir,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
-                                         input_data_dict=self._input_data_dict).run()
+                                         input_data_dict=self._input_data_dict,
+                                         provenance=self._provenance).run()
 
     def _coembed(self):
         """
