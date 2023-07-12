@@ -7,6 +7,7 @@ import time
 import networkx as nx
 from cellmaps_utils import logutils
 from cellmaps_utils import constants
+from cellmaps_utils.provenance import ProvenanceUtil
 
 from cellmaps_imagedownloader.runner import MultiProcessImageDownloader
 from cellmaps_imagedownloader.runner import FakeImageDownloader
@@ -71,6 +72,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  ppi_cutoffs=None,
                  fake=None,
                  provenance=None,
+                 provenance_utils=ProvenanceUtil(),
                  fold=1,
                  input_data_dict=None):
         """
@@ -85,6 +87,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._model_path = model_path
         self._fake = fake
         self._provenance = provenance
+        self._provenance_utils = provenance_utils
         self._fold = fold
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
@@ -143,16 +146,16 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir,
                                               cutoffs=self._ppi_cutoffs)
 
-        refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance)
+        refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance_utils)
 
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
-                                               provenance_utils=self._provenance)
+                                               provenance_utils=self._provenance_utils)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
                                          inputdir=self._coembed_dir,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
                                          input_data_dict=self._input_data_dict,
-                                         provenance=self._provenance).run()
+                                         provenance_utils=self._provenance_utils).run()
 
     def _coembed(self):
         """
