@@ -1,5 +1,6 @@
-Welcome to CM4AI Pipeline's documentation!
-================================================================
+===================
+Cell Maps Pipeline
+===================
 
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_pipeline.svg
@@ -8,15 +9,7 @@ Welcome to CM4AI Pipeline's documentation!
 .. image:: https://img.shields.io/travis/idekerlab/cellmaps_pipeline.svg
         :target: https://travis-ci.com/idekerlab/cellmaps_pipeline
 
-.. image:: https://readthedocs.org/projects/cellmaps-pipeline/badge/?version=latest
-        :target: https://cellmaps-pipeline.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
-
-Python Boilerplate contains all the boilerplate you need to create a Python package with command line
-
+Cell Maps Pipeline for `Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
 
 * Free software: MIT license
 

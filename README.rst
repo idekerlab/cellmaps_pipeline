@@ -1,6 +1,6 @@
-==============
-CM4AI Pipeline
-==============
+===================
+Cell Maps Pipeline
+===================
 
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_pipeline.svg
@@ -13,10 +13,7 @@ CM4AI Pipeline
         :target: https://cellmaps-pipeline.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
-
-
-Runs CM4AI pipeline
+Cell Maps Pipeline for `Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
