@@ -22,18 +22,6 @@ For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
 .. code-block::
 
-   cellmaps_pipelinecmd.py # TODO Add other needed arguments here
-
-Via Docker
----------------
-
-**Example usage**
-
-**TODO:** Add information about example usage
-
-
-.. code-block::
-
-   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_pipeline:0.1.0 cellmaps_pipelinecmd.py # TODO Add other needed arguments here
-
-
+   cellmaps_pipelinecmd.py toyrun --samples example/samples.csv --unique example/unique.csv \
+                           --baitlist example/baitlist.tsv --edgelist example/edgelist.tsv \
+                           --provenance example/provenance.json --model_path example/model.pth
