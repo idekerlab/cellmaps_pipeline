@@ -1,0 +1,38 @@
+{
+  "name": "Pipeline run 1",
+  "organization-name": "Please Fill in",
+  "project-name": "Please fill in",
+  "edgelist": {
+    "name": "bioplex 3 subset",
+    "author": "Huttlin et al.",
+    "version": "3.0",
+    "date-published": "2021",
+    "description": "Summary of protein interactions in the BioPlex 3.0 Network for HEK293T cell AP-MS.",
+    "data-format": "tsv"
+  },
+  "baitlist": {
+    "name": "bioplex 3.0 subset",
+    "author": "Huttlin et al.",
+    "version": "3.0",
+    "date-published": "2021",
+    "description": "Summary of protein interactions in the BioPlex 3.0 Network for HEK293T cell AP-MS.",
+    "data-format": "tsv"
+  },
+  "samples": {
+    "name": "u2os HPA IF images",
+    "author": "Author of dataset",
+    "version": "Version of dataset",
+    "date-published": "Date dataset was published",
+    "description": "Description of dataset",
+    "data-format": "csv"
+  },
+  "unique": {
+    "name": "u2os HPA IF images unique",
+    "author": "Author of dataset",
+    "version": "Version of dataset",
+    "date-published": "Date dataset was published",
+    "description": "Description of dataset",
+    "data-format": "csv"
+  }
+}
+
