@@ -1,21 +1,21 @@
 {
-  "name": "Pipeline run 1",
-  "organization-name": "Please Fill in",
-  "project-name": "Please fill in",
+  "name": "Example input dataset",
+  "organization-name": "CM4AI",
+  "project-name": "Example",
   "edgelist": {
-    "name": "bioplex 3 subset",
-    "author": "Huttlin et al.",
-    "version": "3.0",
-    "date-published": "2021",
-    "description": "Summary of protein interactions in the BioPlex 3.0 Network for HEK293T cell AP-MS.",
+    "name": "Antoine Forget sample edgelist",
+    "author": "Krogan Lab",
+    "version": "1.0",
+    "date-published": "07-31-2023",
+    "description": "AP-MS Protein interactions on HSC2 cell line, example dataset",
     "data-format": "tsv"
   },
   "baitlist": {
-    "name": "bioplex 3.0 subset",
-    "author": "Huttlin et al.",
-    "version": "3.0",
-    "date-published": "2021",
-    "description": "Summary of protein interactions in the BioPlex 3.0 Network for HEK293T cell AP-MS.",
+    "name": "Antoine Forget sample baitlist",
+    "author": "Krogan Lab",
+    "version": "1.0",
+    "date-published": "07-31-2023",
+    "description": "AP-MS Baits used for Protein interactions on HSC2 cell line",
     "data-format": "tsv"
   },
   "samples": {
