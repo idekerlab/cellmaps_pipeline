@@ -4,6 +4,6 @@
 
 __author__ = 'Ideker Lab CM4AI team'
 __email__ = 'tools@cm4ai.org'
-__version__ = '0.1.0a5'
+__version__ = '0.1.0a6'
 __repo_url__ = 'https://github.com/idekerlab/cellmaps_pipeline'
 __description__ = 'Runs full Cellmaps CM4AI pipeline'
