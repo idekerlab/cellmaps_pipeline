@@ -30,10 +30,10 @@ with open('HISTORY.rst') as history_file:
 requirements = ['cellmaps_utils==0.1.0a14',
                 'cellmaps_imagedownloader==0.1.0a7',
                 'cellmaps_ppidownloader==0.1.0a3',
-                'cellmaps_image_embedding==0.1.0a7',
-                'cellmaps_ppi_embedding==0.1.0a4',
-                'cellmaps_coembedding==0.1.0a4',
-                'cellmaps_generate_hierarchy==0.1.0a6',
+                'cellmaps_image_embedding==0.1.0a8',
+                'cellmaps_ppi_embedding==0.1.0a5',
+                'cellmaps_coembedding==0.1.0a5',
+                'cellmaps_generate_hierarchy==0.1.0a7',
                 'networkx>=2.8,<2.9']
 
 setup_requirements = [ ]
