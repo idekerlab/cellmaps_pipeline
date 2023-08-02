@@ -15,7 +15,7 @@ The Cell Maps Pipeline takes `ImmunoFluorescent <https://en.wikipedia.org/wiki/I
 the `Human Protein Atlas <https://www.proteinatlas.org>`__ along with
 `Affinity Purification Mass Spectrometry <https://www.thermofisher.com/us/en/home/industrial/mass-spectrometry/proteomics-protein-mass-spectrometry/proteomics-protein-mass-spectrometry-workflows/protein-structure-analysis-mass-spectrometry/affinity-mass-spectrometry.html>`__
 data from one or more sources, converts them into embeddings that
-are then coembedded and converted into a Protein to Protein Interaction network from which a hierarchical
+are then coembedded and converted into an integrated interaction network from which a hierarchical
 model is derived.
 
 The pipeline invokes six tools that each create an output directory where results are
@@ -27,6 +27,8 @@ Overview of Cell Maps Pipeline
 .. image:: images/pipeline_overview.png
   :alt: Overview of Cell Maps Pipeline which shows PPI and image download followed by embedding, coembedding, and finally hierarchy generation
 
+..
+    The pipeline_overview.png image is from this google doc: https://docs.google.com/drawings/d/1pAqQkmg8hRh7ySkgu5PVY7Hu4pwMyejAzAYzGge0ilU/edit
 
 
 * Free software: MIT license
