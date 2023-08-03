@@ -179,13 +179,12 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         image_coembed_tuples = []
         logger.debug('Fold values: ' + str(fold))
         for fold_val in fold:
-            # TODO: put _fold into constants under cellmaps_utils
             image_embed_dir = os.path.join(self._outdir,
                                      constants.IMAGE_EMBEDDING_STEP_DIR +
-                                     '_fold' + str(fold_val))
+                                           str(fold_val))
             co_embed_dir = os.path.join(self._outdir,
                                         constants.COEMBEDDING_STEP_DIR +
-                                        '_fold' + str(fold_val))
+                                        str(fold_val))
 
             image_coembed_tuples.append((fold_val, image_embed_dir,
                                          co_embed_dir))
@@ -278,7 +277,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                 logger.error('image embedding ' + image_coembed_tuple[1] +
                              'using fold' + str(image_coembed_tuple[0] +
                              ' had non zero exit code of: ' +
-                             str(retval))
+                             str(retval)))
                 return retval
         return 0
 
