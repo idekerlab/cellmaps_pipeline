@@ -53,14 +53,14 @@ def _parse_arguments(desc, args):
                              'GeneSymbol\tGeneID\t# Interactors\n'
                              '"ADA"\t"100"\t1.')
     parser.add_argument('--model_path', type=str,
-                        help='Path to model file. A model file to download '
-                             'is here: '
-                             'https://github.com/'
-                             'CellProfiling/densenet/releases/download/'
-                             'v0.1.0/external_crop512_focal_slov_hardlog'
-                             '_class_densenet121_dropout_i768_aug2_5folds'
-                             '_fold0_final.pth')
-    parser.add_argument('--fold', default=1, type=int, help='Image node attribute file fold to use')
+                        default='https://github.com/CellProfiling/densenet/releases/download/v0.1.0/external_crop512_focal_slov_hardlog_class_densenet121_dropout_i768_aug2_5folds_fold0_final.pth',
+                        help='URL or path to model file for image embedding')
+    parser.add_argument('--fold', default=[1], nargs='+', type=int,
+                        help='Image node attribute file fold(s) to use. '
+                             'Each additional fold specified will create '
+                             'additional 2.image_embedding_fold# and'
+                             '3.coembedding_fold# directories that will be'
+                             'fed into hierarchy step. Valid values are 1 or 2 or 1 2')
     parser.add_argument('--proteinatlasxml',
                         default='https://www.proteinatlas.org/download/proteinatlas.xml.gz',
                         help='URL or path to proteinatlas.xml or proteinatlas.xml.gz file '
@@ -124,7 +124,51 @@ def main(args):
     desc = """
 Version {version}
 
-Runs the full cellmaps pipeline
+The Cell Maps Pipeline takes ImmunoFluorescent images from the Human Protein 
+Atlas along with Affinity Purification Mass Spectrometry data from one or 
+more sources, converts them into embeddings that are then co-embedded and 
+converted into an integrated interaction network from which a hierarchical 
+model is derived.
+
+The pipeline invokes six tools that each create an output directory where 
+results are stored and registered within Research Object Crates (RO-Crate) 
+using the FAIRSCAPE-cli.
+
+For more information visit https://cellmaps-pipeline.readthedocs.io
+
+                 ppi_download  image_download
+                       ||            ||
+                       \/            \/
+              ppi_embedding  image_embedding_fold#
+                        \\\\      //
+                         \\\\    //
+                    co_embedding_fold#
+                           ||
+                           \/
+                        hierarchy
+              
+In default mode this will create the following directories under <outdir> specified
+on the commandline:
+
+  1.image_download
+  1.ppi_download
+  1.ppi_embedding
+  2.image_embedding_fold1
+  3.coembedding_fold1
+  4.hierarchy
+  
+If --fold 1 2 is passed in on the command line the directories would look like this:
+
+  1.image_download
+  1.ppi_download
+  1.ppi_embedding
+  2.image_embedding_fold1
+  2.image_embedding_fold2
+  3.coembedding_fold1
+  3.coembedding_fold2
+  4.hierarchy
+
+
 
 In addition, the --provenance flag is required and must be set to a path 
 to a JSON file. 

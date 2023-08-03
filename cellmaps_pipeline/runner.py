@@ -4,7 +4,9 @@ import os
 import warnings
 import logging
 import time
+import requests
 import networkx as nx
+from tqdm import tqdm
 from cellmaps_utils import logutils
 from cellmaps_utils import constants
 from cellmaps_utils.provenance import ProvenanceUtil
@@ -73,7 +75,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  fake=None,
                  provenance=None,
                  provenance_utils=ProvenanceUtil(),
-                 fold=1,
+                 fold=[1],
                  input_data_dict=None):
         """
         Constructor
@@ -84,11 +86,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._unique = unique
         self._edgelist = edgelist
         self._baitlist = baitlist
-        self._model_path = model_path
+        self._model_path = self._download_model(model_path)
         self._fake = fake
         self._provenance = provenance
         self._provenance_utils = provenance_utils
-        self._fold = fold
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
@@ -98,10 +99,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                      constants.PPI_DOWNLOAD_STEP_DIR)
         self._ppi_embed_dir = os.path.join(self._outdir,
                                            constants.PPI_EMBEDDING_STEP_DIR)
-        self._image_embed_dir = os.path.join(self._outdir,
-                                             constants.IMAGE_EMBEDDING_STEP_DIR)
-        self._coembed_dir = os.path.join(self._outdir,
-                                         constants.COEMBEDDING_STEP_DIR)
+
+        self._image_coembed_tuples = self._get_image_coembed_tuples(fold)
 
         self._hierarchy_dir = os.path.join(self._outdir,
                                            constants.HIERARCHY_STEP_DIR)
@@ -134,6 +133,65 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         return 0
 
+    def _download_model(self, model_path):
+        """
+        If model_path is a URL attempt to download it
+        to pipeline directory, otherwise return as is
+
+        :param model_path: URL or file path to model file needed
+                           for image embedding
+        :type model_path: str
+        :return: path to model file
+        :rtype: str
+        """
+        if os.path.isfile(model_path):
+            return model_path
+        dest_file = os.path.join(self._outdir, 'model.pth')
+        with requests.get(model_path,
+                          stream=True) as r:
+            content_size = int(r.headers.get('content-length', 0))
+            tqdm_bar = tqdm(desc='Downloading ' + os.path.basename(model_path),
+                            total=content_size,
+                            unit='B', unit_scale=True,
+                            unit_divisor=1024)
+            logger.debug('Downloading ' + str(model_path) +
+                         ' of size ' + str(content_size) +
+                         'b to ' + dest_file)
+            try:
+                r.raise_for_status()
+                with open(dest_file, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                        tqdm_bar.update(len(chunk))
+            finally:
+                tqdm_bar.close()
+        return dest_file
+
+    def _get_image_coembed_tuples(self, fold):
+        """
+
+        :param fold:
+        :return:
+        """
+        if fold is None:
+            raise CellmapsPipelineError('Fold cannot be None')
+
+        image_coembed_tuples = []
+        logger.debug('Fold values: ' + str(fold))
+        for fold_val in fold:
+            # TODO: put _fold into constants under cellmaps_utils
+            image_embed_dir = os.path.join(self._outdir,
+                                     constants.IMAGE_EMBEDDING_STEP_DIR +
+                                     '_fold' + str(fold_val))
+            co_embed_dir = os.path.join(self._outdir,
+                                        constants.COEMBEDDING_STEP_DIR +
+                                        '_fold' + str(fold_val))
+
+            image_coembed_tuples.append((fold_val, image_embed_dir,
+                                         co_embed_dir))
+        logger.debug('Value of image_coembed_tuples: ' + str(image_coembed_tuples))
+        return image_coembed_tuples
+
     def _hierarchy(self):
         """
 
@@ -143,7 +201,13 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             warnings.warn('Found hierarchy dir, assuming we are good. skipping')
             return 0
 
-        ppigen = CosineSimilarityPPIGenerator(embeddingdir=self._coembed_dir,
+        coembed_dirs = []
+        for image_coembed_tuple in self._image_coembed_tuples:
+            coembed_dirs.append(image_coembed_tuple[2])
+
+        logger.debug('Coembedding directories: ' + str(coembed_dirs))
+
+        ppigen = CosineSimilarityPPIGenerator(embeddingdir=coembed_dirs,
                                               cutoffs=self._ppi_cutoffs)
 
         refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance_utils)
@@ -151,7 +215,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
                                                provenance_utils=self._provenance_utils)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
-                                         inputdir=self._coembed_dir,
+                                         inputdir=coembed_dirs,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
                                          input_data_dict=self._input_data_dict,
@@ -162,42 +226,61 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         :return:
         """
-        if os.path.isdir(self._coembed_dir):
-            warnings.warn('Found coembedding dir, assuming we are good. skipping')
-            return 0
-
-        if self._fake:
-            gen = FakeCoEmbeddingGenerator(ppi_embeddingdir=self._ppi_embed_dir,
-                                           image_embeddingdir=self._image_embed_dir)
-        else:
-            gen = MuseCoEmbeddingGenerator(outdir=self._coembed_dir,
-                                           ppi_embeddingdir=self._ppi_embed_dir,
-                                           image_embeddingdir=self._image_embed_dir)
-        return CellmapsCoEmbedder(outdir=self._coembed_dir,
-                                  inputdirs=[self._image_embed_dir, self._ppi_embed_dir],
-                                  embedding_generator=gen,
-                                  input_data_dict=self._input_data_dict).run()
+        for image_coembed_tuple in self._image_coembed_tuples:
+            if os.path.isdir(image_coembed_tuple[2]):
+                warnings.warn('Found coembedding dir' +
+                              str(image_coembed_tuple[2]) +
+                              ', assuming we are good. skipping')
+                continue
+            if self._fake:
+                gen = FakeCoEmbeddingGenerator(ppi_embeddingdir=self._ppi_embed_dir,
+                                               image_embeddingdir=image_coembed_tuple[1])
+            else:
+                gen = MuseCoEmbeddingGenerator(outdir=image_coembed_tuple[2],
+                                               ppi_embeddingdir=self._ppi_embed_dir,
+                                               image_embeddingdir=image_coembed_tuple[1])
+            retval = CellmapsCoEmbedder(outdir=image_coembed_tuple[2],
+                                        inputdirs=[image_coembed_tuple[1],
+                                                   self._ppi_embed_dir],
+                                        embedding_generator=gen,
+                                        input_data_dict=self._input_data_dict).run()
+            if retval != 0:
+                logger.error('Coembedding ' + image_coembed_tuple[2] +
+                             'using ' + image_coembed_tuple[1] +
+                             ' had non zero exit code of: ' +
+                             str(retval))
+                return retval
+        return 0
 
     def _embed_image(self):
         """
 
         :return:
         """
-        if os.path.isdir(self._image_embed_dir):
-            warnings.warn('Found image embedding dir, assuming we are good. skipping')
-            return 0
-
-        if self._fake is True:
-            gen = FakeEmbeddingGenerator(self._image_dir)
-        else:
-            gen = DensenetEmbeddingGenerator(self._image_dir,
-                                             outdir=self._image_embed_dir,
-                                             model_path=self._model_path,
-                                             fold=self._fold)
-        return CellmapsImageEmbedder(outdir=self._image_embed_dir,
-                                     inputdir=self._image_dir,
-                                     embedding_generator=gen,
-                                     input_data_dict=self._input_data_dict).run()
+        for image_coembed_tuple in self._image_coembed_tuples:
+            if os.path.isdir(image_coembed_tuple[1]):
+                warnings.warn('Found image_embedding dir' +
+                              str(image_coembed_tuple[1]) +
+                              ', assuming we are good. skipping')
+                continue
+            if self._fake is True:
+                gen = FakeEmbeddingGenerator(self._image_dir)
+            else:
+                gen = DensenetEmbeddingGenerator(self._image_dir,
+                                                 outdir=image_coembed_tuple[1],
+                                                 model_path=self._model_path,
+                                                 fold=int(image_coembed_tuple[0]))
+            retval = CellmapsImageEmbedder(outdir=image_coembed_tuple[1],
+                                           inputdir=self._image_dir,
+                                           embedding_generator=gen,
+                                           input_data_dict=self._input_data_dict).run()
+            if retval != 0:
+                logger.error('image embedding ' + image_coembed_tuple[1] +
+                             'using fold' + str(image_coembed_tuple[0] +
+                             ' had non zero exit code of: ' +
+                             str(retval))
+                return retval
+        return 0
 
     def _embed_ppi(self):
         """
