@@ -18,7 +18,13 @@ For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
 **Example usage**
 
-**TODO:** Add information about example usage
+The cell maps pipeline requires five input files for building MuSIC maps by integrating IF images with an AP-MS interaction network: 
+
+1) samples file: information on image links for download (see sample samples file in examples folder)
+2) unique file: information on antibody to use for each gene (see sample unique file in examples folder)
+3) bait list file: list of baits used for AP-MS experiments
+4) edge list file: list of edges for AP-MS interaction network
+5) image embedding model: see below for how to download
 
 .. code-block::
 
