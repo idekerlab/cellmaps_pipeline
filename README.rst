@@ -13,8 +13,6 @@ Cell Maps Pipeline
         :target: https://cellmaps-pipeline.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-Cell Maps Pipeline for `Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
-
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
 

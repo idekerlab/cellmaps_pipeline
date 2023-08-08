@@ -9,8 +9,6 @@ Cell Maps Pipeline
 .. image:: https://img.shields.io/travis/idekerlab/cellmaps_pipeline.svg
         :target: https://travis-ci.com/idekerlab/cellmaps_pipeline
 
-Cell Maps Pipeline for `Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
-
 The Cell Maps Pipeline takes `ImmunoFluorescent <https://en.wikipedia.org/wiki/Immunofluorescence>`__ images from
 the `Human Protein Atlas <https://www.proteinatlas.org>`__ along with
 `Affinity Purification Mass Spectrometry <https://www.thermofisher.com/us/en/home/industrial/mass-spectrometry/proteomics-protein-mass-spectrometry/proteomics-protein-mass-spectrometry-workflows/protein-structure-analysis-mass-spectrometry/affinity-mass-spectrometry.html>`__
