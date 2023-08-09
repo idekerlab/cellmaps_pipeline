@@ -1,4 +1,4 @@
-* CM4AI Pipeline version:
+* Cell Maps Pipeline version:
 * Python version:
 * Operating System:
 

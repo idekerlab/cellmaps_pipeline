@@ -7,7 +7,7 @@ This page should provide information on how to use cellmaps_pipeline
 In a project
 --------------
 
-To use CM4AI Pipeline in a project::
+To use Cell Maps Pipeline in a project::
 
     import cellmaps_pipeline
 
