@@ -43,6 +43,9 @@ print('\nPrefix if_plate_id')
 renamed_df['if_plate_id'] = 'B2AI_1_' + renamed_df['if_plate_id'].astype(str)
 print(renamed_df.head())
 
+link_list = renamed_df['Baselink'].values.tolist()
+print(link_list)
+
 sys.exit(0)
 
 outdir = sys.argv[2]
