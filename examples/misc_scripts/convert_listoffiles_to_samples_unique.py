@@ -129,8 +129,20 @@ if not os.path.isdir(outdir):
     os.makedirs(sys.argv[2], mode=0o755)
 
 for treatment in ['Paclitaxel', 'untreated', 'Vorinostat']:
+
+    # save samples
     temp_df = final_sample_df[final_sample_df['filename'].str.contains(treatment)]
     temp_df.to_csv(os.path.join(outdir, 'samples_' + treatment.lower() + '.csv'), index=False)
+
+    #save fake proteinatlas_<treatment>.txt
+    with open(os.path.join(outdir, 'proteinatlas_' + treatment.lower() + '.txt'), 'w') as f:
+        for entry in temp_df['linkprefix'].values.tolist():
+            if entry.endswith('_'):
+                suffix = 'blue.jpg'
+            else:
+                suffix = '_blue.jpg'
+            f.write('<imageUrl>' + entry + suffix + '</imageUrl>\n')
+
     # need to make unique.csv now
     temp_unique_df = temp_df.groupby('antibody').head(1).reset_index(drop=True)
     temp_unique_df.drop(['filename', 'position', 'sample', 'if_plate_id',
