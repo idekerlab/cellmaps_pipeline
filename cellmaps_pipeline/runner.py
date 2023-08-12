@@ -86,7 +86,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._unique = unique
         self._edgelist = edgelist
         self._baitlist = baitlist
-        self._model_path = self._download_model(model_path)
+        self._model_path = model_path
         self._fake = fake
         self._provenance = provenance
         self._provenance_utils = provenance_utils
@@ -133,40 +133,6 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         return 0
 
-    def _download_model(self, model_path):
-        """
-        If model_path is a URL attempt to download it
-        to pipeline directory, otherwise return as is
-
-        :param model_path: URL or file path to model file needed
-                           for image embedding
-        :type model_path: str
-        :return: path to model file
-        :rtype: str
-        """
-        if os.path.isfile(model_path):
-            return model_path
-        dest_file = os.path.join(self._outdir, 'model.pth')
-        with requests.get(model_path,
-                          stream=True) as r:
-            content_size = int(r.headers.get('content-length', 0))
-            tqdm_bar = tqdm(desc='Downloading ' + os.path.basename(model_path),
-                            total=content_size,
-                            unit='B', unit_scale=True,
-                            unit_divisor=1024)
-            logger.debug('Downloading ' + str(model_path) +
-                         ' of size ' + str(content_size) +
-                         'b to ' + dest_file)
-            try:
-                r.raise_for_status()
-                with open(dest_file, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                        tqdm_bar.update(len(chunk))
-            finally:
-                tqdm_bar.close()
-        return dest_file
-
     def _get_image_coembed_tuples(self, fold):
         """
 
@@ -206,7 +172,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         logger.debug('Coembedding directories: ' + str(coembed_dirs))
 
-        ppigen = CosineSimilarityPPIGenerator(embeddingdir=coembed_dirs,
+        ppigen = CosineSimilarityPPIGenerator(embeddingdirs=coembed_dirs,
                                               cutoffs=self._ppi_cutoffs)
 
         refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance_utils)
@@ -214,7 +180,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
                                                provenance_utils=self._provenance_utils)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
-                                         inputdir=coembed_dirs,
+                                         inputdirs=coembed_dirs,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
                                          input_data_dict=self._input_data_dict,
