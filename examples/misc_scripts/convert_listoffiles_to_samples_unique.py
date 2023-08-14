@@ -91,6 +91,7 @@ res = mygeneinfo.querymany(list(gene_name_set),
 res_dict = {}
 for entry in res:
     if 'notfound' in entry:
+        print(entry['query'])
         continue
     ensembl_ids = []
     if isinstance(entry['ensembl'], list):
