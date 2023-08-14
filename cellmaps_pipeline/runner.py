@@ -32,6 +32,7 @@ from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
 from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
+from cellmaps_imagedownloader.proteinatlas import LinkPrefixImageDownloadTupleGenerator
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
@@ -298,10 +299,14 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique),
             samples_list=ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples))
 
-        proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
-        proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
-        imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
-                                                  samples_list=imagegen.get_samples_list())
+        if 'linkprefix' in imagegen.get_samples_list()[0]:
+            logger.debug('linkprefix in samples using LinkPrefixImageDownloadTupleGenerator')
+            imageurlgen = LinkPrefixImageDownloadTupleGenerator(samples_list=imagegen.get_samples_list())
+        else:
+            proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
+            proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
+            imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
+                                                      samples_list=imagegen.get_samples_list())
 
         if self._fake is True:
             warnings.warn('FAKE IMAGES ARE BEING DOWNLOADED!!!!!')
