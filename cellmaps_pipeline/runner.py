@@ -61,8 +61,54 @@ class PipelineRunner(object):
         raise NotImplementedError('subclasses need to implement')
 
 
+class SLURMPipelineRunner(PipelineRunner):
+    """
+    Generates SLURM batch files and wrapper script to
+    run various steps in a SLURM environment
+    """
+    def __init__(self, outdir=None,
+                 samples=None,
+                 unique=None,
+                 edgelist=None,
+                 baitlist=None,
+                 model_path=None,
+                 proteinatlasxml=None,
+                 ppi_cutoffs=None,
+                 fake=None,
+                 provenance=None,
+                 provenance_utils=ProvenanceUtil(),
+                 fold=[1],
+                 input_data_dict=None):
+        """
+
+        :param outdir:
+        :param samples:
+        :param unique:
+        :param edgelist:
+        :param baitlist:
+        :param model_path:
+        :param proteinatlasxml:
+        :param ppi_cutoffs:
+        :param fake:
+        :param provenance:
+        :param provenance_utils:
+        :param fold:
+        :param input_data_dict:
+        """
+        pass
+
+    def run(self):
+        """
+        Runs pipeline
+        :param cmd:
+        :raises NotImplementedError: Always raised cause
+                                     subclasses need to implement
+        """
+        raise NotImplementedError('not implemented yet')
+
 class ProgrammaticPipelineRunner(PipelineRunner):
     """
+    Runs pipeline programmatically in a serial fashion
 
     """
     def __init__(self, outdir=None,
