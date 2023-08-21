@@ -8,7 +8,7 @@ Installation
 Stable release
 --------------
 
-To install Cell Maps Pipeline, run this command in your terminal:
+To install the Cell Maps Pipeline, run this command in your terminal:
 
 .. code-block:: console
 

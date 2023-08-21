@@ -96,8 +96,11 @@ against those changes.
 Needed files
 ------------
 
-**TODO:** Add description of needed files
-
+* samples file: CSV file with list of IF images to download (see sample samples file in examples folder)
+* unique file: CSV file of unique samples (see sample unique file in examples folder)
+* bait list file: TSV file of baits used for AP-MS experiments
+* edge list file: TSV file of edges for protein interaction network
+* provenance: file containing provenance information about input files in JSON format (see sample provenance file in examples folder)
 
 Usage
 -----
@@ -106,11 +109,9 @@ For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
 **Example usage**
 
-**TODO:** Add information about example usage
-
 .. code-block::
 
-   cellmaps_pipelinecmd.py # TODO Add other needed arguments here
+   cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples ./examples/samples.csv --unique ./examples/unique.csv --edgelist ./edgelist.tsv --baitlist ./baitlist.tsv 
 
 
 Via Docker
@@ -118,12 +119,10 @@ Via Docker
 
 **Example usage**
 
-**TODO:** Add information about example usage
-
 
 .. code-block::
 
-   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_pipeline:0.1.0 cellmaps_pipelinecmd.py # TODO Add other needed arguments here
+   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_pipeline:0.1.0 cellmaps_pipelinecmd.py  ./cellmaps_pipeline_outdir --samples ./examples/samples.csv --unique ./examples/unique.csv --edgelist ./edgelist.tsv --baitlist ./baitlist.tsv 
 
 
 Credits
