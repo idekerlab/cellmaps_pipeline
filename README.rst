@@ -111,7 +111,7 @@ For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
 .. code-block::
 
-   cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples ./examples/samples.csv --unique ./examples/unique.csv --edgelist ./edgelist.tsv --baitlist ./baitlist.tsv 
+   cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples /examples/samples.csv --unique /examples/unique.csv --edgelist examples/edgelist.tsv --baitlist examples/baitlist.tsv --provenance /examples/provenance.json
 
 
 Via Docker
@@ -122,7 +122,7 @@ Via Docker
 
 .. code-block::
 
-   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_pipeline:0.1.0 cellmaps_pipelinecmd.py  ./cellmaps_pipeline_outdir --samples ./examples/samples.csv --unique ./examples/unique.csv --edgelist ./edgelist.tsv --baitlist ./baitlist.tsv 
+   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_pipeline:0.1.0 cellmaps_pipelinecmd.py  ./cellmaps_pipeline_outdir --samples /examples/samples.csv --unique /examples/unique.csv --edgelist /examples/edgelist.tsv  --baitlist /examples/baitlist.tsv --provenance /examples/provenance.json
 
 
 Credits
