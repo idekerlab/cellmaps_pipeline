@@ -1,4 +1,4 @@
-aDevelopment Process
+Development Process
 =====================
 
 To make a pull request, please create your own user
