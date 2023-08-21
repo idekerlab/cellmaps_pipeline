@@ -35,7 +35,7 @@ def _parse_arguments(desc, args):
                         help='CSV file with list of IF images to download '
                              'in format of filename,if_plate_id,position,'
                              'sample,locations,antibody,ensembl_ids,'
-                             'gene_names\n/archive/1/1_A1_1_,1,A1,1,35,'
+                             'gene_names\n/archive/1/1_A1_1_,1,A1,1,'
                              'Golgi apparatus,HPA000992,ENSG00000066455,GOLGA5')
     parser.add_argument('--unique',
                         help='CSV file of unique samples '

@@ -32,6 +32,7 @@ from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
 from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
+from cellmaps_imagedownloader.proteinatlas import LinkPrefixImageDownloadTupleGenerator
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
@@ -60,8 +61,54 @@ class PipelineRunner(object):
         raise NotImplementedError('subclasses need to implement')
 
 
+class SLURMPipelineRunner(PipelineRunner):
+    """
+    Generates SLURM batch files and wrapper script to
+    run various steps in a SLURM environment
+    """
+    def __init__(self, outdir=None,
+                 samples=None,
+                 unique=None,
+                 edgelist=None,
+                 baitlist=None,
+                 model_path=None,
+                 proteinatlasxml=None,
+                 ppi_cutoffs=None,
+                 fake=None,
+                 provenance=None,
+                 provenance_utils=ProvenanceUtil(),
+                 fold=[1],
+                 input_data_dict=None):
+        """
+
+        :param outdir:
+        :param samples:
+        :param unique:
+        :param edgelist:
+        :param baitlist:
+        :param model_path:
+        :param proteinatlasxml:
+        :param ppi_cutoffs:
+        :param fake:
+        :param provenance:
+        :param provenance_utils:
+        :param fold:
+        :param input_data_dict:
+        """
+        pass
+
+    def run(self):
+        """
+        Runs pipeline
+        :param cmd:
+        :raises NotImplementedError: Always raised cause
+                                     subclasses need to implement
+        """
+        raise NotImplementedError('not implemented yet')
+
 class ProgrammaticPipelineRunner(PipelineRunner):
     """
+    Runs pipeline programmatically in a serial fashion
 
     """
     def __init__(self, outdir=None,
@@ -86,7 +133,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._unique = unique
         self._edgelist = edgelist
         self._baitlist = baitlist
-        self._model_path = self._download_model(model_path)
+        self._model_path = model_path
         self._fake = fake
         self._provenance = provenance
         self._provenance_utils = provenance_utils
@@ -133,40 +180,6 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         return 0
 
-    def _download_model(self, model_path):
-        """
-        If model_path is a URL attempt to download it
-        to pipeline directory, otherwise return as is
-
-        :param model_path: URL or file path to model file needed
-                           for image embedding
-        :type model_path: str
-        :return: path to model file
-        :rtype: str
-        """
-        if os.path.isfile(model_path):
-            return model_path
-        dest_file = os.path.join(self._outdir, 'model.pth')
-        with requests.get(model_path,
-                          stream=True) as r:
-            content_size = int(r.headers.get('content-length', 0))
-            tqdm_bar = tqdm(desc='Downloading ' + os.path.basename(model_path),
-                            total=content_size,
-                            unit='B', unit_scale=True,
-                            unit_divisor=1024)
-            logger.debug('Downloading ' + str(model_path) +
-                         ' of size ' + str(content_size) +
-                         'b to ' + dest_file)
-            try:
-                r.raise_for_status()
-                with open(dest_file, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                        tqdm_bar.update(len(chunk))
-            finally:
-                tqdm_bar.close()
-        return dest_file
-
     def _get_image_coembed_tuples(self, fold):
         """
 
@@ -206,7 +219,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
         logger.debug('Coembedding directories: ' + str(coembed_dirs))
 
-        ppigen = CosineSimilarityPPIGenerator(embeddingdir=coembed_dirs,
+        ppigen = CosineSimilarityPPIGenerator(embeddingdirs=coembed_dirs,
                                               cutoffs=self._ppi_cutoffs)
 
         refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance_utils)
@@ -214,7 +227,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
                                                provenance_utils=self._provenance_utils)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
-                                         inputdir=coembed_dirs,
+                                         inputdirs=coembed_dirs,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
                                          input_data_dict=self._input_data_dict,
@@ -332,10 +345,14 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique),
             samples_list=ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples))
 
-        proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
-        proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
-        imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
-                                                  samples_list=imagegen.get_samples_list())
+        if 'linkprefix' in imagegen.get_samples_list()[0]:
+            logger.debug('linkprefix in samples using LinkPrefixImageDownloadTupleGenerator')
+            imageurlgen = LinkPrefixImageDownloadTupleGenerator(samples_list=imagegen.get_samples_list())
+        else:
+            proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
+            proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
+            imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
+                                                      samples_list=imagegen.get_samples_list())
 
         if self._fake is True:
             warnings.warn('FAKE IMAGES ARE BEING DOWNLOADED!!!!!')

@@ -63,7 +63,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'CM4AI Pipeline'
+project = u'Cell Maps Pipeline'
 copyright = u"2023, The Regents of the University of California"
 author = u"Christopher Churas"
 
@@ -159,7 +159,7 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'cellmaps_pipeline.tex',
-     u'CM4AI Pipeline Documentation',
+     u'Cell Maps Pipeline Documentation',
      u'Christopher Churas', 'manual'),
 ]
 
@@ -170,7 +170,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'cellmaps_pipeline',
-     u'CM4AI Pipeline Documentation',
+     u'Cell Maps Pipeline Documentation',
      [author], 1)
 ]
 
@@ -182,7 +182,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'cellmaps_pipeline',
-     u'CM4AI Pipeline Documentation',
+     u'Cell Maps Pipeline Documentation',
      author,
      'cellmaps_pipeline',
      'One line description of project.',
