@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install CM4AI Pipeline, run this command in your terminal:
+To install the Cell Maps Pipeline, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install cellmaps_pipeline
 
-This is the preferred method to install CM4AI Pipeline, as it will always install the most recent stable release.
+This is the preferred method to install Cell Maps Pipeline, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for CM4AI Pipeline can be downloaded from the `Github repo`_.
+The sources for Cell Maps Pipeline can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
