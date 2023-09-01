@@ -149,7 +149,7 @@ for treatment in ['Paclitaxel', 'untreated', 'Vorinostat']:
     temp_unique_df.drop(['filename', 'position', 'sample', 'if_plate_id',
                          'linkprefix'], axis=1, inplace=True)
     temp_unique_df['n_location'] = 0
-    temp_unique_df['atlas_name'] = 'MDA-MB-469'
+    temp_unique_df['atlas_name'] = 'MDA-MB-468'
     unique_df =temp_unique_df[['antibody', 'ensembl_ids', 'gene_names',
                                'atlas_name', 'locations', 'n_location']]
     print(unique_df.head())
