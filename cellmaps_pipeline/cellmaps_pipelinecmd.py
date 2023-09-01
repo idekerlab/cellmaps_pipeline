@@ -11,6 +11,7 @@ from cellmaps_utils import constants
 from cellmaps_imagedownloader.runner import CellmapsImageDownloader
 from cellmaps_ppidownloader.runner import CellmapsPPIDownloader
 from cellmaps_pipeline.runner import ProgrammaticPipelineRunner
+from cellmaps_pipeline.runner import SLURMPipelineRunner
 import cellmaps_pipeline
 from cellmaps_pipeline.runner import CellmapsPipeline
 
@@ -31,6 +32,14 @@ def _parse_arguments(desc, args):
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=constants.ArgParseFormatter)
     parser.add_argument('outdir', help='Output directory')
+    parser.add_argument('--cm4ai_apms',
+                        help='Path to CM4AI AP-MS table file in RO-Crate')
+    parser.add_argument('--cm4ai_image',
+                        help='Path to CM4AI IF Image table file in RO-Crate')
+    parser.add_argument('--slurm', action='store_true',
+                        help='NOT WORKING YET. If set, a main slurm script named slurmjob.sh will '
+                             'be created in <outdir> along with other slurm scripts '
+                             'to run all the steps in the pipeline')
     parser.add_argument('--samples',
                         help='CSV file with list of IF images to download '
                              'in format of filename,if_plate_id,position,'
@@ -208,18 +217,32 @@ Additional optional fields for registering datasets include
         with open(theargs.provenance, 'r') as f:
             json_prov = json.load(f)
 
-        runner = ProgrammaticPipelineRunner(outdir=theargs.outdir,
-                                            samples=theargs.samples,
-                                            unique=theargs.unique,
-                                            edgelist=theargs.edgelist,
-                                            baitlist=theargs.baitlist,
-                                            model_path=theargs.model_path,
-                                            proteinatlasxml=theargs.proteinatlasxml,
-                                            ppi_cutoffs=theargs.ppi_cutoffs,
-                                            fake=theargs.fake,
-                                            provenance=json_prov,
-                                            fold=theargs.fold,
-                                            input_data_dict=theargs.__dict__)
+        if theargs.slurm is True:
+            runner = SLURMPipelineRunner(outdir=theargs.outdir,
+                                         samples=theargs.samples,
+                                         unique=theargs.unique,
+                                         edgelist=theargs.edgelist,
+                                         baitlist=theargs.baitlist,
+                                         model_path=theargs.model_path,
+                                         proteinatlasxml=theargs.proteinatlasxml,
+                                         ppi_cutoffs=theargs.ppi_cutoffs,
+                                         fake=theargs.fake,
+                                         provenance=json_prov,
+                                         fold=theargs.fold,
+                                         input_data_dict=theargs.__dict__)
+        else:
+            runner = ProgrammaticPipelineRunner(outdir=theargs.outdir,
+                                                samples=theargs.samples,
+                                                unique=theargs.unique,
+                                                edgelist=theargs.edgelist,
+                                                baitlist=theargs.baitlist,
+                                                model_path=theargs.model_path,
+                                                proteinatlasxml=theargs.proteinatlasxml,
+                                                ppi_cutoffs=theargs.ppi_cutoffs,
+                                                fake=theargs.fake,
+                                                provenance=json_prov,
+                                                fold=theargs.fold,
+                                                input_data_dict=theargs.__dict__)
 
         return CellmapsPipeline(outdir=theargs.outdir,
                                 runner=runner,

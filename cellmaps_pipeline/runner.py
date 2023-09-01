@@ -91,6 +91,8 @@ class SLURMPipelineRunner(PipelineRunner):
     run various steps in a SLURM environment
     """
     def __init__(self, outdir=None,
+                 cm4ai_apms=None,
+                 cm4ai_image=None,
                  samples=None,
                  unique=None,
                  edgelist=None,
@@ -101,7 +103,9 @@ class SLURMPipelineRunner(PipelineRunner):
                  fake=None,
                  provenance=None,
                  fold=[1],
-                 input_data_dict=None):
+                 input_data_dict=None,
+                 slurm_partition=None,
+                 slurm_account=None):
         """
 
         :param outdir:
@@ -119,6 +123,8 @@ class SLURMPipelineRunner(PipelineRunner):
         :param input_data_dict:
         """
         super().__init__(outdir=outdir)
+        self._cm4ai_apms = cm4ai_apms
+        self._cm4ai_image = cm4ai_image
         self._samples = samples
         self._unique = unique
         self._edgelist = edgelist
@@ -129,6 +135,8 @@ class SLURMPipelineRunner(PipelineRunner):
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
+        self._slurm_partition = slurm_partition
+        self._slurm_account = slurm_account
         self._image_dir = os.path.join(self._outdir,
                                        constants.IMAGE_DOWNLOAD_STEP_DIR)
         self._ppi_dir = os.path.join(self._outdir,
@@ -141,11 +149,44 @@ class SLURMPipelineRunner(PipelineRunner):
         self._hierarchy_dir = os.path.join(self._outdir,
                                            constants.HIERARCHY_STEP_DIR)
 
+    def _write_slurm_directives(self, out=None,
+                                allocated_time='4:00:00',
+                                mem='32G', cpus_per_task='4',
+                                job_name='cellmaps_pipeline'):
+        """
+
+        :param time:
+        :param mem:
+        :param cpus_per_task:
+        :param job_name:
+        :return:
+        """
+        out.write('#!/bin/bash\n\n')
+        out.write('#SBATCH --job-name=' + str(job_name) + '\n')
+        out.write('#SBATCH --chdir=' + self._outdir + '\n')
+
+        out.write('#SBATCH --output=%x.%j.out')
+        if self._slurm_partition is not None:
+            out.write('#SBATCH --partition=' + self._slurm_partition + '\n')
+        if self._slurm_account is not None:
+            out.write('#SBATCH --account=' + self._slurm_account + '\n')
+        out.write('#SBATCH --ntasks=1\n')
+        out.write('#SBATCH --cpus-per-task=' + str(cpus_per_task) + '\n')
+        out.write('#SBATCH --mem=' + str(mem) + '\n')
+        out.write('#SBATCH --time=' + str(allocated_time) + '\n\n')
+
+        out.write('echo $SLURM_JOB_ID\n')
+        out.write('echo $HOSTNAME\n')
+
     def _generate_download_images_command(self):
         """
         Creates command to download images
         :return:
         """
+        with open(os.path.join(self._outdir, 'imagedownloadjob.sh'), 'w') as f:
+            f.write('#!/bin/bash\n\n')
+            self._write_slurm_directives(out=f, job_name='imagedownload')
+
         return 'imagedownloadjob.sh'
 
     def _generate_download_ppi_command(self):
@@ -200,13 +241,14 @@ class SLURMPipelineRunner(PipelineRunner):
                 # [1] = image embedding dir
                 # [2] = outdir
                 f.write('# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
-                f.write('f' + str(image_coembed_tuple)+ '_coembed_job=$(sbatch --dependency=afterok:')
+                f.write('f' + str(image_coembed_tuple) + '_coembed_job=$(sbatch --dependency=afterok:')
 
             # self._get_coembed_commands()
 
             # self._get_generate_hierarchy_command()
 
         # Todo need to
+
 
 class ProgrammaticPipelineRunner(PipelineRunner):
     """
