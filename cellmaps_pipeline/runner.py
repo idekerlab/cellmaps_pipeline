@@ -45,11 +45,35 @@ class PipelineRunner(object):
     """
     Base command runner
     """
-    def __init__(self):
+    def __init__(self, outdir):
         """
         Constructor
         """
-        pass
+        self._outdir = os.path.abspath(outdir)
+
+    def _get_image_coembed_tuples(self, fold):
+        """
+
+        :param fold:
+        :return:
+        """
+        if fold is None:
+            raise CellmapsPipelineError('Fold cannot be None')
+
+        image_coembed_tuples = []
+        logger.debug('Fold values: ' + str(fold))
+        for fold_val in fold:
+            image_embed_dir = os.path.join(self._outdir,
+                                     constants.IMAGE_EMBEDDING_STEP_DIR +
+                                           str(fold_val))
+            co_embed_dir = os.path.join(self._outdir,
+                                        constants.COEMBEDDING_STEP_DIR +
+                                        str(fold_val))
+
+            image_coembed_tuples.append((fold_val, image_embed_dir,
+                                         co_embed_dir))
+        logger.debug('Value of image_coembed_tuples: ' + str(image_coembed_tuples))
+        return image_coembed_tuples
 
     def run(self):
         """
@@ -76,7 +100,6 @@ class SLURMPipelineRunner(PipelineRunner):
                  ppi_cutoffs=None,
                  fake=None,
                  provenance=None,
-                 provenance_utils=ProvenanceUtil(),
                  fold=[1],
                  input_data_dict=None):
         """
@@ -95,7 +118,56 @@ class SLURMPipelineRunner(PipelineRunner):
         :param fold:
         :param input_data_dict:
         """
-        pass
+        super().__init__(outdir=outdir)
+        self._samples = samples
+        self._unique = unique
+        self._edgelist = edgelist
+        self._baitlist = baitlist
+        self._model_path = model_path
+        self._fake = fake
+        self._provenance = provenance
+        self._proteinatlasxml = proteinatlasxml
+        self._ppi_cutoffs = ppi_cutoffs
+        self._input_data_dict = input_data_dict
+        self._image_dir = os.path.join(self._outdir,
+                                       constants.IMAGE_DOWNLOAD_STEP_DIR)
+        self._ppi_dir = os.path.join(self._outdir,
+                                     constants.PPI_DOWNLOAD_STEP_DIR)
+        self._ppi_embed_dir = os.path.join(self._outdir,
+                                           constants.PPI_EMBEDDING_STEP_DIR)
+
+        self._image_coembed_tuples = self._get_image_coembed_tuples(fold)
+
+        self._hierarchy_dir = os.path.join(self._outdir,
+                                           constants.HIERARCHY_STEP_DIR)
+
+    def _generate_download_images_command(self):
+        """
+        Creates command to download images
+        :return:
+        """
+        return 'imagedownloadjob.sh'
+
+    def _generate_download_ppi_command(self):
+        """
+
+        :return:
+        """
+        return 'ppidownloadjob.sh'
+
+    def _generate_embed_image_command(self):
+        """
+
+        :return:
+        """
+        return 'imageembedjob.sh'
+
+    def _generate_embed_ppi_command(self):
+        """
+
+        :return:
+        """
+        return 'ppiembedjob.sh'
 
     def run(self):
         """
@@ -104,7 +176,37 @@ class SLURMPipelineRunner(PipelineRunner):
         :raises NotImplementedError: Always raised cause
                                      subclasses need to implement
         """
-        raise NotImplementedError('not implemented yet')
+        slurmjobfile = os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
+        with open(slurmjobfile, 'w') as f:
+            f.write('#! /bin/bash\n\n')
+            f.write('# image download no dependencies\n')
+            f.write('image_download_job=$(sbatch ' +
+                    self._generate_download_images_command() + ')\n\n')
+
+            f.write('# ppi download no dependencies\n')
+            f.write('ppi_download_job=$(sbatch ' +
+                    self._generate_download_ppi_command() + ')\n\n')
+
+            f.write('# image embed\n')
+            f.write('image_embed_job=$(sbatch --dependency=afterok:$image_download_job ' +
+                    self._generate_embed_image_command() + ')\n\n')
+
+            f.write('# ppi embed\n')
+            f.write('ppi_embed_job=$(sbatch --dependency=afterok:$ppi_download_job ' +
+                    self._generate_embed_ppi_command() + ')\n\n')
+
+            for image_coembed_tuple in self._image_coembed_tuples():
+                # [0] = fold value
+                # [1] = image embedding dir
+                # [2] = outdir
+                f.write('# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
+                f.write('f' + str(image_coembed_tuple)+ '_coembed_job=$(sbatch --dependency=afterok:')
+
+            # self._get_coembed_commands()
+
+            # self._get_generate_hierarchy_command()
+
+        # Todo need to
 
 class ProgrammaticPipelineRunner(PipelineRunner):
     """
@@ -127,8 +229,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         """
         Constructor
         """
-        super().__init__()
-        self._outdir = os.path.abspath(outdir)
+        super().__init__(outdir=outdir)
         self._samples = samples
         self._unique = unique
         self._edgelist = edgelist
@@ -179,30 +280,6 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             raise CellmapsPipelineError('Hierarchy failed')
 
         return 0
-
-    def _get_image_coembed_tuples(self, fold):
-        """
-
-        :param fold:
-        :return:
-        """
-        if fold is None:
-            raise CellmapsPipelineError('Fold cannot be None')
-
-        image_coembed_tuples = []
-        logger.debug('Fold values: ' + str(fold))
-        for fold_val in fold:
-            image_embed_dir = os.path.join(self._outdir,
-                                     constants.IMAGE_EMBEDDING_STEP_DIR +
-                                           str(fold_val))
-            co_embed_dir = os.path.join(self._outdir,
-                                        constants.COEMBEDDING_STEP_DIR +
-                                        str(fold_val))
-
-            image_coembed_tuples.append((fold_val, image_embed_dir,
-                                         co_embed_dir))
-        logger.debug('Value of image_coembed_tuples: ' + str(image_coembed_tuples))
-        return image_coembed_tuples
 
     def _hierarchy(self):
         """
