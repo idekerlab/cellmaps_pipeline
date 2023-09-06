@@ -45,6 +45,7 @@ class PipelineRunner(object):
     """
     Base command runner
     """
+
     def __init__(self, outdir):
         """
         Constructor
@@ -64,7 +65,7 @@ class PipelineRunner(object):
         logger.debug('Fold values: ' + str(fold))
         for fold_val in fold:
             image_embed_dir = os.path.join(self._outdir,
-                                     constants.IMAGE_EMBEDDING_STEP_DIR +
+                                           constants.IMAGE_EMBEDDING_STEP_DIR +
                                            str(fold_val))
             co_embed_dir = os.path.join(self._outdir,
                                         constants.COEMBEDDING_STEP_DIR +
@@ -72,7 +73,8 @@ class PipelineRunner(object):
 
             image_coembed_tuples.append((fold_val, image_embed_dir,
                                          co_embed_dir))
-        logger.debug('Value of image_coembed_tuples: ' + str(image_coembed_tuples))
+        logger.debug('Value of image_coembed_tuples: ' +
+                     str(image_coembed_tuples))
         return image_coembed_tuples
 
     def run(self):
@@ -90,6 +92,7 @@ class SLURMPipelineRunner(PipelineRunner):
     Generates SLURM batch files and wrapper script to
     run various steps in a SLURM environment
     """
+
     def __init__(self, outdir=None,
                  cm4ai_apms=None,
                  cm4ai_image=None,
@@ -184,8 +187,14 @@ class SLURMPipelineRunner(PipelineRunner):
         :return:
         """
         with open(os.path.join(self._outdir, 'imagedownloadjob.sh'), 'w') as f:
-            f.write('#!/bin/bash\n\n')
             self._write_slurm_directives(out=f, job_name='imagedownload')
+            if self._cm4ai_image != None:
+                input_arg = '--cm4ai_table ' + self._cm4ai_image
+            else:
+                input_arg = '--samples ' + self._samples + ' --unique ' + self._unique
+            f.write('cellmaps_imagedownloadercmd.py ' + os.path.join(self._outdir,
+                    constants.IMAGE_DOWNLOAD_STEP_DIR) + '--provenance ' + self._provenance + ' ' + input_arg + '\n')
+            f.write('exit $?\n')
 
         return 'imagedownloadjob.sh'
 
@@ -240,8 +249,10 @@ class SLURMPipelineRunner(PipelineRunner):
                 # [0] = fold value
                 # [1] = image embedding dir
                 # [2] = outdir
-                f.write('# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
-                f.write('f' + str(image_coembed_tuple) + '_coembed_job=$(sbatch --dependency=afterok:')
+                f.write(
+                    '# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
+                f.write('f' + str(image_coembed_tuple) +
+                        '_coembed_job=$(sbatch --dependency=afterok:')
 
             # self._get_coembed_commands()
 
@@ -255,6 +266,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
     Runs pipeline programmatically in a serial fashion
 
     """
+
     def __init__(self, outdir=None,
                  samples=None,
                  unique=None,
@@ -329,7 +341,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         :return:
         """
         if os.path.isdir(self._hierarchy_dir):
-            warnings.warn('Found hierarchy dir, assuming we are good. skipping')
+            warnings.warn(
+                'Found hierarchy dir, assuming we are good. skipping')
             return 0
 
         coembed_dirs = []
@@ -341,7 +354,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         ppigen = CosineSimilarityPPIGenerator(embeddingdirs=coembed_dirs,
                                               cutoffs=self._ppi_cutoffs)
 
-        refiner = HiDeFHierarchyRefiner(provenance_utils=self._provenance_utils)
+        refiner = HiDeFHierarchyRefiner(
+            provenance_utils=self._provenance_utils)
 
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
                                                provenance_utils=self._provenance_utils)
@@ -408,8 +422,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             if retval != 0:
                 logger.error('image embedding ' + image_coembed_tuple[1] +
                              'using fold' + str(image_coembed_tuple[0] +
-                             ' had non zero exit code of: ' +
-                             str(retval)))
+                                                ' had non zero exit code of: ' +
+                                                str(retval)))
                 return retval
         return 0
 
@@ -419,7 +433,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         :return:
         """
         if os.path.isdir(self._ppi_embed_dir):
-            warnings.warn('Found ppi embedding dir, assuming we are good. skipping')
+            warnings.warn(
+                'Found ppi embedding dir, assuming we are good. skipping')
             return 0
         gen = Node2VecEmbeddingGenerator(
             nx_network=nx.read_edgelist(CellMapsPPIEmbedder.get_apms_edgelist_file(self._ppi_dir),
@@ -439,7 +454,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             warnings.warn('Found ppi dir, assuming we are good. skipping')
             return 0
         apmsgen = APMSGeneNodeAttributeGenerator(
-            apms_edgelist=APMSGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(self._edgelist),
+            apms_edgelist=APMSGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(
+                self._edgelist),
             apms_baitlist=APMSGeneNodeAttributeGenerator.get_apms_baitlist_from_tsvfile(self._baitlist))
 
         return CellmapsPPIDownloader(outdir=self._ppi_dir,
@@ -461,15 +477,20 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         logger.info('Downloading images')
 
         imagegen = ImageGeneNodeAttributeGenerator(
-            unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique),
+            unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(
+                self._unique),
             samples_list=ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples))
 
         if 'linkprefix' in imagegen.get_samples_list()[0]:
-            logger.debug('linkprefix in samples using LinkPrefixImageDownloadTupleGenerator')
-            imageurlgen = LinkPrefixImageDownloadTupleGenerator(samples_list=imagegen.get_samples_list())
+            logger.debug(
+                'linkprefix in samples using LinkPrefixImageDownloadTupleGenerator')
+            imageurlgen = LinkPrefixImageDownloadTupleGenerator(
+                samples_list=imagegen.get_samples_list())
         else:
-            proteinatlas_reader = ProteinAtlasReader(self._image_dir, proteinatlas=self._proteinatlasxml)
-            proteinatlas_urlreader = ProteinAtlasImageUrlReader(reader=proteinatlas_reader)
+            proteinatlas_reader = ProteinAtlasReader(
+                self._image_dir, proteinatlas=self._proteinatlasxml)
+            proteinatlas_urlreader = ProteinAtlasImageUrlReader(
+                reader=proteinatlas_reader)
             imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
                                                       samples_list=imagegen.get_samples_list())
 
@@ -493,6 +514,7 @@ class CellmapsPipeline(object):
     """
     Class to run algorithm
     """
+
     def __init__(self, outdir=None,
                  runner=None,
                  input_data_dict=None):
@@ -527,7 +549,8 @@ class CellmapsPipeline(object):
 
         logutils.write_task_start_json(outdir=self._outdir,
                                        start_time=self._start_time,
-                                       data={'commandlineargs': self._input_data_dict},
+                                       data={
+                                           'commandlineargs': self._input_data_dict},
                                        version=cellmaps_pipeline.__version__)
 
         exit_status = 99
