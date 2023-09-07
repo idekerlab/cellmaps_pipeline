@@ -300,29 +300,27 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('ppi_download_job=$(sbatch ' +
                     self._generate_download_ppi_command() + ')\n\n')
 
-            f.write('# image embed\n')
-            f.write('image_embed_job=$(sbatch --dependency=afterok:$image_download_job ' +
-                    self._generate_embed_image_command() + ')\n\n')
-
             f.write('# ppi embed\n')
             f.write('ppi_embed_job=$(sbatch --dependency=afterok:$ppi_download_job ' +
                     self._generate_embed_ppi_command() + ')\n\n')
 
+            embed_job_names = ['$ppi_embed_job']
             for image_coembed_tuple in self._image_coembed_tuples:
                 # [0] = fold value
                 # [1] = image embedding dir
                 # [2] = outdir
                 f.write('# image embed\n')
                 f.write('image_embed_job' + str(image_coembed_tuple[0]) + '=$(sbatch --dependency=afterok:$image_download_job ' +
-                        self._generate_embed_image_command(fold=str(image_coembed_tuple[0])) + ')\n\n')
+                        self._generate_embed_image_command(fold=image_coembed_tuple[0]) + ')\n\n')
                 f.write(
-                    '# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
-                f.write('f' + str(image_coembed_tuple) +
-                        '_coembed_job=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]))
-
-                # self._get_coembed_commands(fold=str(image_coembed_tuple[0]))
-
-            # self._get_generate_hierarchy_command()
+                    '# fold' + str(image_coembed_tuple[0]) + ' co-embedding\n')
+                embed_job_name='f' + str(image_coembed_tuple) + '_coembed_job'
+                f.write(embed_job_name + '=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]) + ' ' +
+                        self._generate_coembed_command(fold=image_coembed_tuple[0]))
+                embed_job_names.append('$' + embed_job_name)
+            dependency_str = ':'.join(embed_job_names)
+            f.write('# hierarchy\n')
+            f.write('hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ')\n\n')
 
         # Todo need to
 
