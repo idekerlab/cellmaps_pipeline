@@ -103,3 +103,16 @@ class TestSLURMPipelineRunner(unittest.TestCase):
             self.assertTrue(os.path.isfile(filename))
         finally:
             shutil.rmtree(temp_dir)
+
+    def test_slurm_run(self):
+        temp_dir = tempfile.mkdtemp()
+        samples = 'test_samples'
+        unique = 'test_unique'
+        provenance = 'test_provenance'
+        try:
+            myobj = SLURMPipelineRunner(temp_dir, samples=samples, unique=unique, provenance=provenance)
+            filename = os.path.join(temp_dir, 'slurm_cellmaps_job.sh')
+            myobj.run()
+            self.assertTrue(os.path.isfile(filename))
+        finally:
+            shutil.rmtree(temp_dir)
