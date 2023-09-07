@@ -190,34 +190,97 @@ class SLURMPipelineRunner(PipelineRunner):
             self._write_slurm_directives(out=f, job_name='imagedownload')
             if self._cm4ai_image != None:
                 input_arg = '--cm4ai_table ' + self._cm4ai_image
-            else:
+            elif self._samples != None and self._unique != None:
                 input_arg = '--samples ' + self._samples + ' --unique ' + self._unique
-            f.write('cellmaps_imagedownloadercmd.py ' + os.path.join(self._outdir,
-                    constants.IMAGE_DOWNLOAD_STEP_DIR) + '--provenance ' + self._provenance + ' ' + input_arg + '\n')
+            else:
+                raise CellmapsPipelineError(
+                    'You must provide cm4ai_table parameter or samples and unque parameters.')
+            if self._provenance == None:
+                raise CellmapsPipelineError(
+                    'You must provide provenance parameter')
+            f.write('cellmaps_imagedownloadercmd.py ' + self._image_dir +
+                    '--provenance ' + self._provenance + ' ' + input_arg + '\n')
             f.write('exit $?\n')
 
         return 'imagedownloadjob.sh'
 
     def _generate_download_ppi_command(self):
         """
-
-        :return:
+        Creates command to download ppi
+        :return: ppidownloadjob.sh
         """
+        with open(os.path.join(self._outdir, 'ppidownloadjob.sh'), 'w') as f:
+            self._write_slurm_directives(out=f, job_name='ppidownload')
+            if self._cm4ai_image != None:
+                input_arg = '--cm4ai_table ' + self._cm4ai_image
+            elif self._samples != None and self._unique != None:
+                input_arg = '--samples ' + self._samples + ' --unique ' + self._unique
+            else:
+                raise CellmapsPipelineError(
+                    'You must provide cm4ai_table parameter or samples and unque parameters.')
+            if self._provenance == None:
+                raise CellmapsPipelineError(
+                    'You must provide provenance parameter')
+            f.write('cellmaps_ppidownloadercmd.py ' + self._ppi_dir +
+                    ' --provenance ' + self._provenance + ' ' + input_arg + '\n')
+            f.write('exit $?\n')
         return 'ppidownloadjob.sh'
 
-    def _generate_embed_image_command(self):
+    def _generate_embed_image_command(self, fold=1):
         """
-
-        :return:
+        Creates command to generate image embedding
+        :return: imageembedjob.sh
         """
-        return 'imageembedjob.sh'
+        filename = 'imageembedjob' + str(fold) + '.sh'
+        with open(os.path.join(self._outdir, filename), 'w') as f:
+            self._write_slurm_directives(out=f, job_name='imageembed' + str(fold))
+            fake = '--fake_embedder' if self._fake == True else ""
+            f.write('cellmaps_image_embeddingcmd.py ' + self._image_coembed_tuples[fold - 1][1] +
+                    ' --fold ' + str(fold) + ' --inputdir ' + self._image_dir + ' ' + fake + ' -vvvv\n')
+            f.write('exit $?\n')
+        return filename
 
     def _generate_embed_ppi_command(self):
         """
-
-        :return:
+        Creates command to generate ppi embedding
+        :return: ppiembedjob.sh
         """
+        with open(os.path.join(self._outdir, 'ppiembedjob.sh'), 'w') as f:
+            self._write_slurm_directives(out = f, job_name = 'ppiembed')
+            fake="--fake_embedder" if self._fake == True else ""
+            f.write('cellmaps_ppi_embeddingcmd.py ' + self._ppi_embed_dir +
+                    ' --inputdir ' + self._ppi_dir + ' ' + fake + ' -vvvv\n')
+            f.write('exit $?\n')
         return 'ppiembedjob.sh'
+
+    def _generate_coembed_command(self, fold=1):
+        """
+        Creates command to generate coembedding
+        :return: coembedjob.sh
+        """
+        filename = 'coembeddingjob' + str(fold) + '.sh'
+        with open(os.path.join(self._outdir, filename), 'w') as f:
+            self._write_slurm_directives(out=f, job_name='coembedding' + str(fold))
+            fake = '--fake_embedding' if self._fake == True else ""
+            f.write('cellmaps_coembeddingcmd.py ' + self._image_coembed_tuples[fold - 1][2] + ' --ppi_embeddingdir ' + self._ppi_embed_dir +
+                    ' --image_embeddingdir ' + self._image_coembed_tuples[fold - 1][1] + ' ' + fake + ' -vvvv\n')
+            f.write('exit $?\n')
+        return filename
+
+    def _generate_hierarchy_command(self):
+        """
+        Creates command to generate hierarchy
+        :return: hierarchyjob.sh
+        """
+        with open(os.path.join(self._outdir, 'hierarchyjob.sh'), 'w') as f:
+            self._write_slurm_directives(out = f, job_name = 'hierarchy')
+            f.write('cellmaps_generate_hierarchycmd.py ' + self._hierarchy_dir + ' --coembedding_dirs ')
+            for image_coembed_tuple in self._image_coembed_tuples:
+                f.write(image_coembed_tuple[2] + ' ')
+            f.write('-vvvv\n')
+            f.write('exit $?\n')
+        return 'hierarchyjob.sh'
+
 
     def run(self):
         """
@@ -226,7 +289,7 @@ class SLURMPipelineRunner(PipelineRunner):
         :raises NotImplementedError: Always raised cause
                                      subclasses need to implement
         """
-        slurmjobfile = os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
+        slurmjobfile=os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
         with open(slurmjobfile, 'w') as f:
             f.write('#! /bin/bash\n\n')
             f.write('# image download no dependencies\n')
@@ -245,16 +308,19 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('ppi_embed_job=$(sbatch --dependency=afterok:$ppi_download_job ' +
                     self._generate_embed_ppi_command() + ')\n\n')
 
-            for image_coembed_tuple in self._image_coembed_tuples():
+            for image_coembed_tuple in self._image_coembed_tuples:
                 # [0] = fold value
                 # [1] = image embedding dir
                 # [2] = outdir
+                f.write('# image embed\n')
+                f.write('image_embed_job' + str(image_coembed_tuple[0]) + '=$(sbatch --dependency=afterok:$image_download_job ' +
+                        self._generate_embed_image_command(fold=str(image_coembed_tuple[0])) + ')\n\n')
                 f.write(
                     '# fold' + str(image_coembed_tuple[0] + ' co-embedding\n'))
                 f.write('f' + str(image_coembed_tuple) +
-                        '_coembed_job=$(sbatch --dependency=afterok:')
+                        '_coembed_job=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]))
 
-            # self._get_coembed_commands()
+                # self._get_coembed_commands(fold=str(image_coembed_tuple[0]))
 
             # self._get_generate_hierarchy_command()
 
@@ -267,7 +333,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     """
 
-    def __init__(self, outdir=None,
+    def __init__(self, outdir = None,
                  samples=None,
                  unique=None,
                  edgelist=None,
