@@ -64,7 +64,7 @@ def _parse_arguments(desc, args):
     parser.add_argument('--model_path', type=str,
                         default='https://github.com/CellProfiling/densenet/releases/download/v0.1.0/external_crop512_focal_slov_hardlog_class_densenet121_dropout_i768_aug2_5folds_fold0_final.pth',
                         help='URL or path to model file for image embedding')
-    parser.add_argument('--fold', default=[1], nargs='+', type=int,
+    parser.add_argument('--fold', default=[1,2], nargs='+', type=int,
                         help='Image node attribute file fold(s) to use. '
                              'Each additional fold specified will create '
                              'additional 2.image_embedding_fold# and'
@@ -133,14 +133,14 @@ def main(args):
     desc = """
 Version {version}
 
-The Cell Maps Pipeline takes ImmunoFluorescent images from the Human Protein 
-Atlas along with Affinity Purification Mass Spectrometry data from one or 
-more sources, converts them into embeddings that are then co-embedded and 
-converted into an integrated interaction network from which a hierarchical 
+The Cell Maps Pipeline takes ImmunoFluorescent images from the Human Protein
+Atlas along with Affinity Purification Mass Spectrometry data from one or
+more sources, converts them into embeddings that are then co-embedded and
+converted into an integrated interaction network from which a hierarchical
 model is derived.
 
-The pipeline invokes six tools that each create an output directory where 
-results are stored and registered within Research Object Crates (RO-Crate) 
+The pipeline invokes six tools that each create an output directory where
+results are stored and registered within Research Object Crates (RO-Crate)
 using the FAIRSCAPE-cli.
 
 For more information visit https://cellmaps-pipeline.readthedocs.io
@@ -155,7 +155,7 @@ For more information visit https://cellmaps-pipeline.readthedocs.io
                            ||
                            \/
                         hierarchy
-              
+
 In default mode this will create the following directories under <outdir> specified
 on the commandline:
 
@@ -165,7 +165,7 @@ on the commandline:
   2.image_embedding_fold1
   3.coembedding_fold1
   4.hierarchy
-  
+
 If --fold 1 2 is passed in on the command line the directories would look like this:
 
   1.image_download
@@ -179,8 +179,8 @@ If --fold 1 2 is passed in on the command line the directories would look like t
 
 
 
-In addition, the --provenance flag is required and must be set to a path 
-to a JSON file. 
+In addition, the --provenance flag is required and must be set to a path
+to a JSON file.
 
 If datasets are already registered with FAIRSCAPE then the following is sufficient:
 
@@ -190,7 +190,7 @@ If datasets are NOT registered, then the following is required:
 
 {register}
 
-Additional optional fields for registering datasets include 
+Additional optional fields for registering datasets include
 'url', 'used-by', 'associated-publication', and 'additional-documentation'
     """.format(version=cellmaps_pipeline.__version__,
                withguids=withguids_json,
@@ -227,7 +227,7 @@ Additional optional fields for registering datasets include
                                          proteinatlasxml=theargs.proteinatlasxml,
                                          ppi_cutoffs=theargs.ppi_cutoffs,
                                          fake=theargs.fake,
-                                         provenance=json_prov,
+                                         provenance=theargs.provenance,
                                          fold=theargs.fold,
                                          input_data_dict=theargs.__dict__)
         else:
