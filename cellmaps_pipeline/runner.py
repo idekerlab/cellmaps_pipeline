@@ -168,7 +168,7 @@ class SLURMPipelineRunner(PipelineRunner):
         out.write('#SBATCH --job-name=' + str(job_name) + '\n')
         out.write('#SBATCH --chdir=' + self._outdir + '\n')
 
-        out.write('#SBATCH --output=%x.%j.out')
+        out.write('#SBATCH --output=%x.%j.out\n')
         if self._slurm_partition is not None:
             out.write('#SBATCH --partition=' + self._slurm_partition + '\n')
         if self._slurm_account is not None:
@@ -199,7 +199,7 @@ class SLURMPipelineRunner(PipelineRunner):
                 raise CellmapsPipelineError(
                     'You must provide provenance parameter')
             f.write('cellmaps_imagedownloadercmd.py ' + self._image_dir +
-                    '--provenance ' + self._provenance + ' ' + input_arg + '\n')
+                    ' --provenance ' + self._provenance + ' ' + input_arg + '\n')
             f.write('exit $?\n')
 
         return 'imagedownloadjob.sh'
@@ -314,15 +314,15 @@ class SLURMPipelineRunner(PipelineRunner):
                         self._generate_embed_image_command(fold=image_coembed_tuple[0]) + ')\n\n')
                 f.write(
                     '# fold' + str(image_coembed_tuple[0]) + ' co-embedding\n')
-                embed_job_name='f' + str(image_coembed_tuple) + '_coembed_job'
+                embed_job_name='f' + str(image_coembed_tuple[0]) + '_coembed_job'
                 f.write(embed_job_name + '=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]) + ' ' +
                         self._generate_coembed_command(fold=image_coembed_tuple[0]))
                 embed_job_names.append('$' + embed_job_name)
+                f.write('\n\n')
             dependency_str = ':'.join(embed_job_names)
             f.write('# hierarchy\n')
             f.write('hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ')\n\n')
-
-        # Todo need to
+            f.write('echo "job submitted; here is ID of final hierarchy job: $hierarchy_job"\n')
 
 
 class ProgrammaticPipelineRunner(PipelineRunner):
