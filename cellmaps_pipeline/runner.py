@@ -126,15 +126,15 @@ class SLURMPipelineRunner(PipelineRunner):
         :param input_data_dict:
         """
         super().__init__(outdir=outdir)
-        self._cm4ai_apms = cm4ai_apms
-        self._cm4ai_image = cm4ai_image
-        self._samples = samples
-        self._unique = unique
-        self._edgelist = edgelist
-        self._baitlist = baitlist
+        self._cm4ai_apms = cm4ai_apms if cm4ai_apms is None or os.path.isabs(cm4ai_apms) else os.path.join(os.getcwd(), cm4ai_apms)
+        self._cm4ai_image = cm4ai_image if cm4ai_image is None or os.path.isabs(cm4ai_image) else os.path.join(os.getcwd(), cm4ai_image)
+        self._samples = samples if samples is None or os.path.isabs(samples) else os.path.join(os.getcwd(), samples)
+        self._unique = unique if unique is None or os.path.isabs(unique) else os.path.join(os.getcwd(), unique)
+        self._edgelist = edgelist if edgelist is None or os.path.isabs(edgelist) else os.path.join(os.getcwd(), edgelist)
+        self._baitlist = baitlist if baitlist is None or os.path.isabs(baitlist) else os.path.join(os.getcwd(), baitlist)
         self._model_path = model_path
         self._fake = fake
-        self._provenance = provenance
+        self._provenance = provenance if provenance is None or os.path.isabs(provenance) else os.path.join(os.getcwd(), provenance)
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
@@ -201,7 +201,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_imagedownloadercmd.py ' + self._image_dir +
                     ' --provenance ' + self._provenance + ' ' + input_arg + '\n')
             f.write('exit $?\n')
-
+        os.chmod(os.path.join(self._outdir, 'imagedownloadjob.sh'), 0o755)
         return 'imagedownloadjob.sh'
 
     def _generate_download_ppi_command(self):
@@ -224,6 +224,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_ppidownloadercmd.py ' + self._ppi_dir +
                     ' --provenance ' + self._provenance + ' ' + input_arg + '\n')
             f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, 'ppidownloadjob.sh'), 0o755)
         return 'ppidownloadjob.sh'
 
     def _generate_embed_image_command(self, fold=1):
@@ -238,6 +239,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_image_embeddingcmd.py ' + self._image_coembed_tuples[fold - 1][1] +
                     ' --fold ' + str(fold) + ' --inputdir ' + self._image_dir + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, filename), 0o755)
         return filename
 
     def _generate_embed_ppi_command(self):
@@ -251,6 +253,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_ppi_embeddingcmd.py ' + self._ppi_embed_dir +
                     ' --inputdir ' + self._ppi_dir + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, 'ppiembedjob.sh'), 0o755)
         return 'ppiembedjob.sh'
 
     def _generate_coembed_command(self, fold=1):
@@ -265,6 +268,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_coembeddingcmd.py ' + self._image_coembed_tuples[fold - 1][2] + ' --ppi_embeddingdir ' + self._ppi_embed_dir +
                     ' --image_embeddingdir ' + self._image_coembed_tuples[fold - 1][1] + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, filename), 0o755)
         return filename
 
     def _generate_hierarchy_command(self):
@@ -279,6 +283,7 @@ class SLURMPipelineRunner(PipelineRunner):
                 f.write(image_coembed_tuple[2] + ' ')
             f.write('-vvvv\n')
             f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
         return 'hierarchyjob.sh'
 
 
@@ -294,15 +299,15 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('#! /bin/bash\n\n')
             f.write('# image download no dependencies\n')
             f.write('image_download_job=$(sbatch ' +
-                    self._generate_download_images_command() + ')\n\n')
+                    self._generate_download_images_command() + ' | awk \'{print $4}\')\n\n')
 
             f.write('# ppi download no dependencies\n')
             f.write('ppi_download_job=$(sbatch ' +
-                    self._generate_download_ppi_command() + ')\n\n')
+                    self._generate_download_ppi_command() + ' | awk \'{print $4}\')\n\n')
 
             f.write('# ppi embed\n')
             f.write('ppi_embed_job=$(sbatch --dependency=afterok:$ppi_download_job ' +
-                    self._generate_embed_ppi_command() + ')\n\n')
+                    self._generate_embed_ppi_command() + ' | awk \'{print $4}\')\n\n')
 
             embed_job_names = ['$ppi_embed_job']
             for image_coembed_tuple in self._image_coembed_tuples:
@@ -311,18 +316,18 @@ class SLURMPipelineRunner(PipelineRunner):
                 # [2] = outdir
                 f.write('# image embed\n')
                 f.write('image_embed_job' + str(image_coembed_tuple[0]) + '=$(sbatch --dependency=afterok:$image_download_job ' +
-                        self._generate_embed_image_command(fold=image_coembed_tuple[0]) + ')\n\n')
+                        self._generate_embed_image_command(fold=image_coembed_tuple[0]) + ' | awk \'{print $4}\')\n\n')
                 f.write(
                     '# fold' + str(image_coembed_tuple[0]) + ' co-embedding\n')
                 embed_job_name='f' + str(image_coembed_tuple[0]) + '_coembed_job'
                 f.write(embed_job_name + '=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]) + ' ' +
-                        self._generate_coembed_command(fold=image_coembed_tuple[0]))
+                        self._generate_coembed_command(fold=image_coembed_tuple[0]) + ' | awk \'{print $4}\')\n\n')
                 embed_job_names.append('$' + embed_job_name)
-                f.write('\n\n')
             dependency_str = ':'.join(embed_job_names)
             f.write('# hierarchy\n')
-            f.write('hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ')\n\n')
+            f.write('hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ' | awk \'{print $4}\')\n\n')
             f.write('echo "job submitted; here is ID of final hierarchy job: $hierarchy_job"\n')
+        os.chmod(slurmjobfile, 0o755)
 
 
 class ProgrammaticPipelineRunner(PipelineRunner):
