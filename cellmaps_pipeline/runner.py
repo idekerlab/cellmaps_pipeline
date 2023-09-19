@@ -211,13 +211,11 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'ppidownloadjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='ppidownload')
-            if self._cm4ai_image != None:
-                input_arg = '--cm4ai_table ' + self._cm4ai_image
-            elif self._samples != None and self._unique != None:
-                input_arg = '--samples ' + self._samples + ' --unique ' + self._unique
+            if self._edgelist != None and self._baitlist != None:
+                input_arg = '--edgelist ' + self._edgelist + ' --baitlist ' + self._baitlist
             else:
                 raise CellmapsPipelineError(
-                    'You must provide cm4ai_table parameter or samples and unque parameters.')
+                    'You must provide edgelist and baitlist parameters.')
             if self._provenance == None:
                 raise CellmapsPipelineError(
                     'You must provide provenance parameter')
