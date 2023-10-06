@@ -211,7 +211,9 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'ppidownloadjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='ppidownload')
-            if self._edgelist != None and self._baitlist != None:
+            if self._cm4ai_apms != None:
+                input_arg = '--cm4ai_table ' + self._cm4ai_apms
+            elif self._edgelist != None and self._baitlist != None:
                 input_arg = '--edgelist ' + self._edgelist + ' --baitlist ' + self._baitlist
             else:
                 raise CellmapsPipelineError(
