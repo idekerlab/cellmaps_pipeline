@@ -219,6 +219,8 @@ Additional optional fields for registering datasets include
 
         if theargs.slurm is True:
             runner = SLURMPipelineRunner(outdir=theargs.outdir,
+                                         cm4ai_image=theargs.cm4ai_image,
+                                         cm4ai_apms=theargs.cm4ai_apms,
                                          samples=theargs.samples,
                                          unique=theargs.unique,
                                          edgelist=theargs.edgelist,
