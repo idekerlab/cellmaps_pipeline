@@ -53,11 +53,11 @@ class TestSLURMPipelineRunner(unittest.TestCase):
 
     def test_generate_download_ppi_command(self):
         temp_dir = tempfile.mkdtemp()
-        samples = 'test_samples'
-        unique = 'test_unique'
+        edgelist = 'edgelist'
+        baitlist = 'baitlist'
         provenance = 'test_provenance'
         try:
-            myobj = SLURMPipelineRunner(temp_dir, samples=samples, unique=unique, provenance=provenance)
+            myobj = SLURMPipelineRunner(temp_dir, edgelist=edgelist, baitlist=baitlist, provenance=provenance)
             filename = os.path.join(temp_dir, 'ppidownloadjob.sh')
             myobj._generate_download_ppi_command()
             self.assertTrue(os.path.isfile(filename))
@@ -108,9 +108,12 @@ class TestSLURMPipelineRunner(unittest.TestCase):
         temp_dir = tempfile.mkdtemp()
         samples = 'test_samples'
         unique = 'test_unique'
+        edgelist = 'edgelist'
+        baitlist = 'baitlist'
         provenance = 'test_provenance'
         try:
-            myobj = SLURMPipelineRunner(temp_dir, samples=samples, unique=unique, provenance=provenance)
+            myobj = SLURMPipelineRunner(temp_dir, samples=samples, unique=unique,
+                                        edgelist=edgelist, baitlist=baitlist, provenance=provenance)
             filename = os.path.join(temp_dir, 'slurm_cellmaps_job.sh')
             myobj.run()
             self.assertTrue(os.path.isfile(filename))
