@@ -1,6 +1,5 @@
 Development Process
 =====================
 
-TODO need to denote that development go on
-``dev`` branch and each user should have their own
-branch and pull request into ``dev``
+To make a pull request, please create your own user
+``dev`` branch and request a pull request into the repository ``dev`` branch. 
