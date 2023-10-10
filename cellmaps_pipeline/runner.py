@@ -4,9 +4,8 @@ import os
 import warnings
 import logging
 import time
-import requests
 import networkx as nx
-from tqdm import tqdm
+from cellmaps_imagedownloader.exceptions import CellMapsImageDownloaderError
 from cellmaps_utils import logutils
 from cellmaps_utils import constants
 from cellmaps_utils.provenance import ProvenanceUtil
@@ -14,9 +13,10 @@ from cellmaps_utils.provenance import ProvenanceUtil
 from cellmaps_imagedownloader.runner import MultiProcessImageDownloader
 from cellmaps_imagedownloader.runner import FakeImageDownloader
 from cellmaps_imagedownloader.runner import CellmapsImageDownloader
-from cellmaps_imagedownloader.gene import ImageGeneNodeAttributeGenerator
+from cellmaps_imagedownloader.runner import CM4AICopyDownloader
+from cellmaps_imagedownloader.gene import ImageGeneNodeAttributeGenerator, CM4AITableConverter
 from cellmaps_ppidownloader.runner import CellmapsPPIDownloader
-from cellmaps_ppidownloader.gene import APMSGeneNodeAttributeGenerator
+from cellmaps_ppidownloader.gene import APMSGeneNodeAttributeGenerator, CM4AIGeneNodeAttributeGenerator
 from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
 from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 from cellmaps_image_embedding.runner import CellmapsImageEmbedder
@@ -29,14 +29,13 @@ from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
 from cellmaps_generate_hierarchy.hierarchy import CDAPSHiDeFHierarchyGenerator
 from cellmaps_generate_hierarchy.maturehierarchy import HiDeFHierarchyRefiner
 from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
-from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader
+from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader, CM4AIImageCopyTupleGenerator
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
 from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
 from cellmaps_imagedownloader.proteinatlas import LinkPrefixImageDownloadTupleGenerator
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
-
 
 logger = logging.getLogger(__name__)
 
@@ -286,7 +285,6 @@ class SLURMPipelineRunner(PipelineRunner):
         os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
         return 'hierarchyjob.sh'
 
-
     def run(self):
         """
         Runs pipeline
@@ -336,7 +334,9 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     """
 
-    def __init__(self, outdir = None,
+    def __init__(self, outdir=None,
+                 cm4ai_apms=None,
+                 cm4ai_image=None,
                  samples=None,
                  unique=None,
                  edgelist=None,
@@ -353,6 +353,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         Constructor
         """
         super().__init__(outdir=outdir)
+        self._cm4ai_amps = cm4ai_apms
+        self._cm4ai_image = cm4ai_image
         self._samples = samples
         self._unique = unique
         self._edgelist = edgelist
@@ -522,15 +524,22 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         if os.path.isdir(self._ppi_dir):
             warnings.warn('Found ppi dir, assuming we are good. skipping')
             return 0
-        apmsgen = APMSGeneNodeAttributeGenerator(
-            apms_edgelist=APMSGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(
-                self._edgelist),
-            apms_baitlist=APMSGeneNodeAttributeGenerator.get_apms_baitlist_from_tsvfile(self._baitlist))
+
+        json_prov = self._provenance
+        if self._cm4ai_amps is None:
+            apmsgen = APMSGeneNodeAttributeGenerator(
+                apms_edgelist=APMSGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(
+                    self._edgelist),
+                apms_baitlist=APMSGeneNodeAttributeGenerator.get_apms_baitlist_from_tsvfile(self._baitlist))
+        else:
+            json_prov[CellmapsPPIDownloader.CM4AI_ROCRATE] = os.path.abspath(os.path.dirname(self._cm4ai_amps))
+            apmsgen = CM4AIGeneNodeAttributeGenerator(apms_edgelist=
+                                                      CM4AIGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(self._cm4ai_amps))
 
         return CellmapsPPIDownloader(outdir=self._ppi_dir,
                                      apmsgen=apmsgen,
                                      input_data_dict=self._input_data_dict,
-                                     provenance=self._provenance).run()
+                                     provenance=json_prov).run()
 
     def _download_images(self):
         """
@@ -545,12 +554,21 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             return 0
         logger.info('Downloading images')
 
-        imagegen = ImageGeneNodeAttributeGenerator(
-            unique_list=ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(
-                self._unique),
-            samples_list=ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples))
+        if self._cm4ai_image is not None:
+            converter = CM4AITableConverter(cm4ai=self._cm4ai_image)
+            samples_list, unique_list = converter.get_samples_and_unique_lists()
+        elif self._samples is not None and self._unique is not None:
+            samples_list = ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples)
+            unique_list = ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique)
+        else:
+            raise CellMapsImageDownloaderError("Parameters samples and unique or cm4ai_image must be provided.")
 
-        if 'linkprefix' in imagegen.get_samples_list()[0]:
+        imagegen = ImageGeneNodeAttributeGenerator(unique_list=unique_list,
+                                                   samples_list=samples_list)
+
+        if self._cm4ai_image is not None:
+            imageurlgen = CM4AIImageCopyTupleGenerator(samples_list=imagegen.get_samples_list())
+        elif 'linkprefix' in imagegen.get_samples_list()[0]:
             logger.debug(
                 'linkprefix in samples using LinkPrefixImageDownloadTupleGenerator')
             imageurlgen = LinkPrefixImageDownloadTupleGenerator(
@@ -566,6 +584,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         if self._fake is True:
             warnings.warn('FAKE IMAGES ARE BEING DOWNLOADED!!!!!')
             dloader = FakeImageDownloader()
+        elif self._cm4ai_image is not None:
+            dloader = CM4AICopyDownloader()
         else:
             dloader = MultiProcessImageDownloader()
         # Todo: input_data_dict should NOT be required to run this

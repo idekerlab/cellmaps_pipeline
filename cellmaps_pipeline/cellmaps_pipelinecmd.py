@@ -234,6 +234,8 @@ Additional optional fields for registering datasets include
                                          input_data_dict=theargs.__dict__)
         else:
             runner = ProgrammaticPipelineRunner(outdir=theargs.outdir,
+                                                cm4ai_image=theargs.cm4ai_image,
+                                                cm4ai_apms=theargs.cm4ai_apms,
                                                 samples=theargs.samples,
                                                 unique=theargs.unique,
                                                 edgelist=theargs.edgelist,
