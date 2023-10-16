@@ -630,8 +630,6 @@ class CellmapsPipeline(object):
         :return:
         """
         logger.debug('In run method')
-        if self._outdir is None:
-            raise CellmapsPipelineError('outdir must be set')
 
         if not os.path.isdir(self._outdir):
             os.makedirs(self._outdir, mode=0o755)
