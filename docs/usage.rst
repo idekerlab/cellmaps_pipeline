@@ -16,6 +16,10 @@ On the command line
 
 For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
+**Example usage for CM4AI data**
+
+Coming soon...
+
 **Example usage**
 
 The cell maps pipeline requires the following input files for building MuSIC maps by integrating IF images with an AP-MS interaction network: 
