@@ -53,6 +53,7 @@ See links below for more information about the individual tools
 
    installation
    usage
+   outputs
    modules
    developer
    authors
