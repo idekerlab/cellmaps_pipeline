@@ -101,7 +101,7 @@ detailed information.
 * **4.hierarchy**
 
   Output from `cellmaps_generate_hierarchy, <https://cellmaps-generate-hierarchy.readthedocs.io>`__
-  information on output coming soon...
+  information on output `click here <https://cellmaps-generate-hierarchy.readthedocs.io/en/latest/outputs.html>`__
 
   Example content:
 
