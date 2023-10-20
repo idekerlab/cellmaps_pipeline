@@ -6,8 +6,8 @@ Cell Maps Pipeline
 .. image:: https://img.shields.io/pypi/v/cellmaps_pipeline.svg
         :target: https://pypi.python.org/pypi/cellmaps_pipeline
 
-.. image:: https://img.shields.io/travis/idekerlab/cellmaps_pipeline.svg
-        :target: https://travis-ci.com/idekerlab/cellmaps_pipeline
+.. image:: https://app.travis-ci.com/idekerlab/cellmaps_pipeline.svg?branch=main
+        :target: https://app.travis-ci.com/idekerlab/cellmaps_pipeline
 
 The Cell Maps Pipeline takes `ImmunoFluorescent <https://en.wikipedia.org/wiki/Immunofluorescence>`__ images from
 the `Human Protein Atlas <https://www.proteinatlas.org>`__ along with
@@ -31,12 +31,29 @@ Overview of Cell Maps Pipeline
 
 * Free software: MIT license
 
+
+Tools
+^^^^^^
+
+See links below for more information about the individual tools
+
+* `cellmaps_imagedownloader <https://cellmaps-imagedownloader.readthedocs.io>`__
+* `cellmaps_ppidownloader  <https://cellmaps-ppidownloader.readthedocs.io>`__
+* `cellmaps_image_embedding <https://cellmaps-image-embedding.readthedocs.io>`__
+* `cellmaps_ppi_embedding <https://cellmaps-ppi-embedding.readthedocs.io>`__
+* `cellmaps_coembedding <https://cellmaps-coembedding.readthedocs.io>`__
+* `cellmaps_generate_hierarchy <https://cellmaps-generate-hierarchy.readthedocs.io>`__
+
+
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    installation
    usage
+   outputs
    modules
    developer
    authors
