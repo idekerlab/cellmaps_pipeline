@@ -37,9 +37,10 @@ def _parse_arguments(desc, args):
     parser.add_argument('--cm4ai_image',
                         help='Path to CM4AI IF Image table file in RO-Crate')
     parser.add_argument('--slurm', action='store_true',
-                        help='NOT WORKING YET. If set, a main slurm script named slurmjob.sh will '
-                             'be created in <outdir> along with other slurm scripts '
-                             'to run all the steps in the pipeline')
+                        help='If set, a main slurm script named slurm_cellmaps_job.sh will '
+                             'be created in <outdir> along with other slurm scripts. '
+                             'To run the pipeline directly invoke ./slurm_cellmaps_job.sh '
+                             'on a SLURM submit node')
     parser.add_argument('--samples',
                         help='CSV file with list of IF images to download '
                              'in format of filename,if_plate_id,position,'
