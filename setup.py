@@ -28,7 +28,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['cellmaps_utils==0.1.0a21',
-                'cellmaps_imagedownloader==0.1.0a14',
+                'cellmaps_imagedownloader==0.1.0a15',
                 'cellmaps_ppidownloader==0.1.0a7',
                 'cellmaps_image_embedding==0.1.0a12',
                 'cellmaps_ppi_embedding==0.1.0a8',

@@ -346,6 +346,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  ppi_cutoffs=None,
                  fake=None,
                  provenance=None,
+                 skip_logging=False,
                  provenance_utils=ProvenanceUtil(),
                  fold=[1],
                  input_data_dict=None):
@@ -366,6 +367,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
+        self._skip_logging = skip_logging
         self._image_dir = os.path.join(self._outdir,
                                        constants.IMAGE_DOWNLOAD_STEP_DIR)
         self._ppi_dir = os.path.join(self._outdir,
@@ -434,6 +436,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                          inputdirs=coembed_dirs,
                                          ppigen=ppigen,
                                          hiergen=hiergen,
+                                         skip_logging=self._skip_logging,
                                          input_data_dict=self._input_data_dict,
                                          provenance_utils=self._provenance_utils).run()
 
@@ -459,6 +462,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                         inputdirs=[image_coembed_tuple[1],
                                                    self._ppi_embed_dir],
                                         embedding_generator=gen,
+                                        skip_logging=self._skip_logging,
                                         input_data_dict=self._input_data_dict).run()
             if retval != 0:
                 logger.error('Coembedding ' + image_coembed_tuple[2] +
@@ -489,6 +493,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             retval = CellmapsImageEmbedder(outdir=image_coembed_tuple[1],
                                            inputdir=self._image_dir,
                                            embedding_generator=gen,
+                                           skip_logging=self._skip_logging,
                                            input_data_dict=self._input_data_dict).run()
             if retval != 0:
                 logger.error('image embedding ' + image_coembed_tuple[1] +
@@ -514,6 +519,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         return CellMapsPPIEmbedder(outdir=self._ppi_embed_dir,
                                    embedding_generator=gen,
                                    inputdir=self._ppi_dir,
+                                   skip_logging=self._skip_logging,
                                    input_data_dict=self._input_data_dict).run()
 
     def _download_ppi(self):
@@ -539,6 +545,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         return CellmapsPPIDownloader(outdir=self._ppi_dir,
                                      apmsgen=apmsgen,
                                      input_data_dict=self._input_data_dict,
+                                     skip_logging=self._skip_logging,
                                      provenance=json_prov).run()
 
     def _download_images(self):
@@ -561,7 +568,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             samples_list = ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples)
             unique_list = ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique)
         else:
-            raise CellMapsImageDownloaderError("Parameters samples and unique or cm4ai_image must be provided.")
+            raise CellMapsImageDownloaderError("Parameters --samples and "
+                                               "--unique or --cm4ai_apms and "
+                                               "--cm4ai_image must be "
+                                               "provided.")
 
         imagegen = ImageGeneNodeAttributeGenerator(unique_list=unique_list,
                                                    samples_list=samples_list)
@@ -596,6 +606,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                                        imageurlgen=imageurlgen,
                                        provenance=self._provenance,
                                        skip_failed=True,
+                                       skip_logging=self._skip_logging,
                                        input_data_dict=self._input_data_dict).run()
 
 

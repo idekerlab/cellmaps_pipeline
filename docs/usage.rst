@@ -7,9 +7,34 @@ This page should provide information on how to use cellmaps_pipeline
 In a project
 --------------
 
-To use Cell Maps Pipeline in a project::
+To use Cell Maps Pipeline in a project:
 
-    import cellmaps_pipeline
+.. code-block:: python
+
+    import os
+    import json
+    from cellmaps_pipeline.runner import ProgrammaticPipelineRunner
+    from cellmaps_pipeline.runner import CellmapsPipeline
+
+    # load the provenance as a dict
+        with open(os.path.join('examples', 'provenance.json'), 'r') as f:
+            json_prov = json.load(f)
+
+    runner = ProgrammaticPipelineRunner(outdir='testrun',
+                                        samples=os.path.join('examples', 'samples.csv'),
+                                        unique=os.path.join('examples', 'unique.csv'),
+                                        edgelist=os.path.join('examples', 'edgelist.tsv'),
+                                        baitlist=os.path.join('examples', 'baitlist.tsv'),
+                                        model_path='https://github.com/CellProfiling/densenet/releases/download/v0.1.0/external_crop512_focal_slov_hardlog_class_densenet121_dropout_i768_aug2_5folds_fold0_final.pth',
+                                        provenance=json_prov,
+                                        ppi_cutoffs=[0.001, 0.01],
+                                        input_data_dict={})
+
+    pipeline = CellmapsPipeline(outdir='testrun',
+                                runner=runner,
+                                input_data_dict={})
+    print('Status code: ' + str(pipeline.run()))
+
 
 On the command line
 ---------------------
