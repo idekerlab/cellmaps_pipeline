@@ -33,6 +33,7 @@ from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader, CM4AIImage
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
 from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
 from cellmaps_imagedownloader.proteinatlas import LinkPrefixImageDownloadTupleGenerator
+from cellmaps_hierarchyeval.runner import CellmapshierarchyevalRunner
 
 import cellmaps_pipeline
 from cellmaps_pipeline.exceptions import CellmapsPipelineError
@@ -125,15 +126,20 @@ class SLURMPipelineRunner(PipelineRunner):
         :param input_data_dict:
         """
         super().__init__(outdir=outdir)
-        self._cm4ai_apms = cm4ai_apms if cm4ai_apms is None or os.path.isabs(cm4ai_apms) else os.path.join(os.getcwd(), cm4ai_apms)
-        self._cm4ai_image = cm4ai_image if cm4ai_image is None or os.path.isabs(cm4ai_image) else os.path.join(os.getcwd(), cm4ai_image)
+        self._cm4ai_apms = cm4ai_apms if cm4ai_apms is None or os.path.isabs(cm4ai_apms) else os.path.join(os.getcwd(),
+                                                                                                           cm4ai_apms)
+        self._cm4ai_image = cm4ai_image if cm4ai_image is None or os.path.isabs(cm4ai_image) else os.path.join(
+            os.getcwd(), cm4ai_image)
         self._samples = samples if samples is None or os.path.isabs(samples) else os.path.join(os.getcwd(), samples)
         self._unique = unique if unique is None or os.path.isabs(unique) else os.path.join(os.getcwd(), unique)
-        self._edgelist = edgelist if edgelist is None or os.path.isabs(edgelist) else os.path.join(os.getcwd(), edgelist)
-        self._baitlist = baitlist if baitlist is None or os.path.isabs(baitlist) else os.path.join(os.getcwd(), baitlist)
+        self._edgelist = edgelist if edgelist is None or os.path.isabs(edgelist) else os.path.join(os.getcwd(),
+                                                                                                   edgelist)
+        self._baitlist = baitlist if baitlist is None or os.path.isabs(baitlist) else os.path.join(os.getcwd(),
+                                                                                                   baitlist)
         self._model_path = model_path
         self._fake = fake
-        self._provenance = provenance if provenance is None or os.path.isabs(provenance) else os.path.join(os.getcwd(), provenance)
+        self._provenance = provenance if provenance is None or os.path.isabs(provenance) else os.path.join(os.getcwd(),
+                                                                                                           provenance)
         self._proteinatlasxml = proteinatlasxml
         self._ppi_cutoffs = ppi_cutoffs
         self._input_data_dict = input_data_dict
@@ -150,6 +156,9 @@ class SLURMPipelineRunner(PipelineRunner):
 
         self._hierarchy_dir = os.path.join(self._outdir,
                                            constants.HIERARCHY_STEP_DIR)
+
+        self._hierarchy_eval_dir = os.path.join(self._outdir,
+                                                constants.HIERARCHYEVAL_STEP_DIR)
 
     def _write_slurm_directives(self, out=None,
                                 allocated_time='4:00:00',
@@ -247,8 +256,8 @@ class SLURMPipelineRunner(PipelineRunner):
         :return: ppiembedjob.sh
         """
         with open(os.path.join(self._outdir, 'ppiembedjob.sh'), 'w') as f:
-            self._write_slurm_directives(out = f, job_name = 'ppiembed')
-            fake="--fake_embedder" if self._fake == True else ""
+            self._write_slurm_directives(out=f, job_name='ppiembed')
+            fake = "--fake_embedder" if self._fake == True else ""
             f.write('cellmaps_ppi_embeddingcmd.py ' + self._ppi_embed_dir +
                     ' --inputdir ' + self._ppi_dir + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
@@ -264,7 +273,8 @@ class SLURMPipelineRunner(PipelineRunner):
         with open(os.path.join(self._outdir, filename), 'w') as f:
             self._write_slurm_directives(out=f, job_name='coembedding' + str(fold))
             fake = '--fake_embedding' if self._fake == True else ""
-            f.write('cellmaps_coembeddingcmd.py ' + self._image_coembed_tuples[fold - 1][2] + ' --ppi_embeddingdir ' + self._ppi_embed_dir +
+            f.write('cellmaps_coembeddingcmd.py ' + self._image_coembed_tuples[fold - 1][
+                2] + ' --ppi_embeddingdir ' + self._ppi_embed_dir +
                     ' --image_embeddingdir ' + self._image_coembed_tuples[fold - 1][1] + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
         os.chmod(os.path.join(self._outdir, filename), 0o755)
@@ -276,7 +286,7 @@ class SLURMPipelineRunner(PipelineRunner):
         :return: hierarchyjob.sh
         """
         with open(os.path.join(self._outdir, 'hierarchyjob.sh'), 'w') as f:
-            self._write_slurm_directives(out = f, job_name = 'hierarchy')
+            self._write_slurm_directives(out=f, job_name='hierarchy')
             f.write('cellmaps_generate_hierarchycmd.py ' + self._hierarchy_dir + ' --coembedding_dirs ')
             for image_coembed_tuple in self._image_coembed_tuples:
                 f.write(image_coembed_tuple[2] + ' ')
@@ -285,6 +295,20 @@ class SLURMPipelineRunner(PipelineRunner):
         os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
         return 'hierarchyjob.sh'
 
+    def _generate_hierarchyeval_command(self):
+        """
+        Creates command to perform hierarchy evaluation
+        :return: hierarchyevaljob.sh
+        """
+        with open(os.path.join(self._outdir, 'hierarchyevaljob.sh'), 'w') as f:
+            self._write_slurm_directives(out=f, job_name='hierarchyeval')
+            f.write('cellmaps_hierarchyevalcmd.py ' + self._hierarchy_eval_dir + ' --hierarchy_dir ' +
+                    self._hierarchy_dir)
+            f.write(' -vvvv\n')
+            f.write('exit $?\n')
+        os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
+        return 'hierarchyevaljob.sh'
+
     def run(self):
         """
         Runs pipeline
@@ -292,7 +316,7 @@ class SLURMPipelineRunner(PipelineRunner):
         :raises NotImplementedError: Always raised cause
                                      subclasses need to implement
         """
-        slurmjobfile=os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
+        slurmjobfile = os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
         with open(slurmjobfile, 'w') as f:
             f.write('#! /bin/bash\n\n')
             f.write('# image download no dependencies\n')
@@ -313,18 +337,26 @@ class SLURMPipelineRunner(PipelineRunner):
                 # [1] = image embedding dir
                 # [2] = outdir
                 f.write('# image embed\n')
-                f.write('image_embed_job' + str(image_coembed_tuple[0]) + '=$(sbatch --dependency=afterok:$image_download_job ' +
+                f.write('image_embed_job' + str(
+                    image_coembed_tuple[0]) + '=$(sbatch --dependency=afterok:$image_download_job ' +
                         self._generate_embed_image_command(fold=image_coembed_tuple[0]) + ' | awk \'{print $4}\')\n\n')
                 f.write(
                     '# fold' + str(image_coembed_tuple[0]) + ' co-embedding\n')
-                embed_job_name='f' + str(image_coembed_tuple[0]) + '_coembed_job'
-                f.write(embed_job_name + '=$(sbatch --dependency=afterok:$image_embed_job' + str(image_coembed_tuple[0]) + ' ' +
+                embed_job_name = 'f' + str(image_coembed_tuple[0]) + '_coembed_job'
+                f.write(embed_job_name + '=$(sbatch --dependency=afterok:$image_embed_job' + str(
+                    image_coembed_tuple[0]) + ' ' +
                         self._generate_coembed_command(fold=image_coembed_tuple[0]) + ' | awk \'{print $4}\')\n\n')
                 embed_job_names.append('$' + embed_job_name)
             dependency_str = ':'.join(embed_job_names)
             f.write('# hierarchy\n')
-            f.write('hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ' | awk \'{print $4}\')\n\n')
+            f.write(
+                'hierarchy_job=$(sbatch --dependency=afterok:' + dependency_str + ' ' + self._generate_hierarchy_command() + ' | awk \'{print $4}\')\n\n')
             f.write('echo "job submitted; here is ID of final hierarchy job: $hierarchy_job"\n')
+            f.write('# hierarchyeval\n')
+            f.write(
+                'hierarchyeval_job=$(sbatch --dependency=afterok:$hierarchy_job ' +
+                self._generate_hierarchyeval_command() + ' | awk \'{print $4}\')\n\n')
+            f.write('echo "job submitted; here is ID of final hierarchyeval job: $hierarchyeval_job"\n')
         os.chmod(slurmjobfile, 0o755)
 
 
@@ -380,6 +412,9 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         self._hierarchy_dir = os.path.join(self._outdir,
                                            constants.HIERARCHY_STEP_DIR)
 
+        self._hierarchy_eval_dir = os.path.join(self._outdir,
+                                                constants.HIERARCHYEVAL_STEP_DIR)
+
     def run(self):
         """
         Runs pipeline programmatically in serial steps. This would
@@ -406,7 +441,25 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         if self._hierarchy() != 0:
             raise CellmapsPipelineError('Hierarchy failed')
 
+        if self._hierarchy_eval() != 0:
+            raise CellmapsPipelineError('Hierarchy eval failed')
+
         return 0
+
+    def _hierarchy_eval(self):
+        """
+
+        :return:
+        """
+        if os.path.isdir(self._hierarchy_eval_dir):
+            warnings.warn(
+                'Found hierarchy eval dir, assuming we are good. skipping')
+            return 0
+
+        return CellmapshierarchyevalRunner(outdir=self._hierarchy_eval_dir,
+                                           hierarchy_dir=self._hierarchy_dir,
+                                           input_data_dict=self._input_data_dict,
+                                           provenance_utils=self._provenance_utils).run()
 
     def _hierarchy(self):
         """
@@ -540,7 +593,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         else:
             json_prov[CellmapsPPIDownloader.CM4AI_ROCRATE] = os.path.abspath(os.path.dirname(self._cm4ai_amps))
             apmsgen = CM4AIGeneNodeAttributeGenerator(apms_edgelist=
-                                                      CM4AIGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(self._cm4ai_amps))
+                                                      CM4AIGeneNodeAttributeGenerator.get_apms_edgelist_from_tsvfile(
+                                                          self._cm4ai_amps))
 
         return CellmapsPPIDownloader(outdir=self._ppi_dir,
                                      apmsgen=apmsgen,
