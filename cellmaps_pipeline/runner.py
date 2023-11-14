@@ -306,7 +306,7 @@ class SLURMPipelineRunner(PipelineRunner):
                     self._hierarchy_dir)
             f.write(' -vvvv\n')
             f.write('exit $?\n')
-        os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
+        os.chmod(os.path.join(self._outdir, 'hierarchyevaljob.sh'), 0o755)
         return 'hierarchyevaljob.sh'
 
     def run(self):
