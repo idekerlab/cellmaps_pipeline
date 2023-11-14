@@ -29,6 +29,7 @@ from cellmaps_generate_hierarchy.ppi import CosineSimilarityPPIGenerator
 from cellmaps_generate_hierarchy.hierarchy import CDAPSHiDeFHierarchyGenerator
 from cellmaps_generate_hierarchy.maturehierarchy import HiDeFHierarchyRefiner
 from cellmaps_generate_hierarchy.runner import CellmapsGenerateHierarchy
+from cellmaps_generate_hierarchy.hcx import HCXFromCDAPSCXHierarchy
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasReader, CM4AIImageCopyTupleGenerator
 from cellmaps_imagedownloader.proteinatlas import ProteinAtlasImageUrlReader
 from cellmaps_imagedownloader.proteinatlas import ImageDownloadTupleGenerator
@@ -483,7 +484,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         refiner = HiDeFHierarchyRefiner(
             provenance_utils=self._provenance_utils)
 
+        converter = HCXFromCDAPSCXHierarchy()
+
         hiergen = CDAPSHiDeFHierarchyGenerator(refiner=refiner,
+                                               hcxconverter=converter,
                                                provenance_utils=self._provenance_utils)
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
                                          inputdirs=coembed_dirs,
