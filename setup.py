@@ -32,8 +32,9 @@ requirements = ['cellmaps_utils==0.1.0a21',
                 'cellmaps_ppidownloader==0.1.0a7',
                 'cellmaps_image_embedding==0.1.0a12',
                 'cellmaps_ppi_embedding==0.1.0a8',
-                'cellmaps_coembedding==0.1.0a8',
-                'cellmaps_generate_hierarchy==0.1.0a12',
+                'cellmaps_coembedding==0.1.0a9',
+                'cellmaps_generate_hierarchy==0.1.0a13',
+                'cellmaps_hierarchyeval==0.1.0a2',
                 'networkx>=2.8,<2.9',
                 'tqdm']
 
