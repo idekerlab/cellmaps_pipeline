@@ -43,7 +43,7 @@ See links below for more information about the individual tools
 * `cellmaps_ppi_embedding <https://cellmaps-ppi-embedding.readthedocs.io>`__
 * `cellmaps_coembedding <https://cellmaps-coembedding.readthedocs.io>`__
 * `cellmaps_generate_hierarchy <https://cellmaps-generate-hierarchy.readthedocs.io>`__
-
+* `cellmaps_hierarchyeval <https://cellmaps-hierarchyeval.readthedocs.io>`__
 
 
 
