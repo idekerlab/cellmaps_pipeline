@@ -649,11 +649,11 @@ class ProgrammaticPipelineRunner(PipelineRunner):
             imageurlgen = ImageDownloadTupleGenerator(reader=proteinatlas_urlreader,
                                                       samples_list=imagegen.get_samples_list())
 
-        if self._fake is True:
+        if self._cm4ai_image is not None:
+            dloader = CM4AICopyDownloader()
+        elif self._fake is True:
             warnings.warn('FAKE IMAGES ARE BEING DOWNLOADED!!!!!')
             dloader = FakeImageDownloader()
-        elif self._cm4ai_image is not None:
-            dloader = CM4AICopyDownloader()
         else:
             dloader = MultiProcessImageDownloader()
         # Todo: input_data_dict should NOT be required to run this
