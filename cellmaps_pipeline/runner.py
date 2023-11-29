@@ -190,6 +190,12 @@ class SLURMPipelineRunner(PipelineRunner):
         out.write('echo $SLURM_JOB_ID\n')
         out.write('echo $HOSTNAME\n')
 
+    def _write_directory_check(self, out, directory):
+        out.write(f"if [ -d \"{directory}\" ]; then\n")
+        out.write(f"    echo \"Directory {directory} exists. Skipping job.\"\n")
+        out.write("    exit 0\n")
+        out.write("fi\n\n")
+
     def _generate_download_images_command(self):
         """
         Creates command to download images
@@ -197,6 +203,7 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'imagedownloadjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='imagedownload')
+            self._write_directory_check(f, self._image_dir)
             if self._cm4ai_image != None:
                 input_arg = '--cm4ai_table ' + self._cm4ai_image
             elif self._samples != None and self._unique != None:
@@ -220,6 +227,7 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'ppidownloadjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='ppidownload')
+            self._write_directory_check(f, self._ppi_dir)
             if self._cm4ai_apms != None:
                 input_arg = '--cm4ai_table ' + self._cm4ai_apms
             elif self._edgelist != None and self._baitlist != None:
@@ -244,7 +252,8 @@ class SLURMPipelineRunner(PipelineRunner):
         filename = 'imageembedjob' + str(fold) + '.sh'
         with open(os.path.join(self._outdir, filename), 'w') as f:
             self._write_slurm_directives(out=f, job_name='imageembed' + str(fold))
-            fake = '--fake_embedder' if self._fake == True else ""
+            self._write_directory_check(f, self._image_coembed_tuples[fold - 1][1])
+            fake = '--fake_embedder' if self._fake is True else ""
             f.write('cellmaps_image_embeddingcmd.py ' + self._image_coembed_tuples[fold - 1][1] +
                     ' --fold ' + str(fold) + ' --inputdir ' + self._image_dir + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
@@ -258,7 +267,8 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'ppiembedjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='ppiembed')
-            fake = "--fake_embedder" if self._fake == True else ""
+            self._write_directory_check(f, self._ppi_embed_dir)
+            fake = "--fake_embedder" if self._fake is True else ""
             f.write('cellmaps_ppi_embeddingcmd.py ' + self._ppi_embed_dir +
                     ' --inputdir ' + self._ppi_dir + ' ' + fake + ' -vvvv\n')
             f.write('exit $?\n')
@@ -273,7 +283,8 @@ class SLURMPipelineRunner(PipelineRunner):
         filename = 'coembeddingjob' + str(fold) + '.sh'
         with open(os.path.join(self._outdir, filename), 'w') as f:
             self._write_slurm_directives(out=f, job_name='coembedding' + str(fold))
-            fake = '--fake_embedding' if self._fake == True else ""
+            self._write_directory_check(f, self._image_coembed_tuples[fold - 1][2])
+            fake = '--fake_embedding' if self._fake is True else ""
             f.write('cellmaps_coembeddingcmd.py ' + self._image_coembed_tuples[fold - 1][
                 2] + ' --ppi_embeddingdir ' + self._ppi_embed_dir +
                     ' --image_embeddingdir ' + self._image_coembed_tuples[fold - 1][1] + ' ' + fake + ' -vvvv\n')
@@ -288,6 +299,7 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'hierarchyjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='hierarchy')
+            self._write_directory_check(f, self._hierarchy_dir)
             f.write('cellmaps_generate_hierarchycmd.py ' + self._hierarchy_dir + ' --coembedding_dirs ')
             for image_coembed_tuple in self._image_coembed_tuples:
                 f.write(image_coembed_tuple[2] + ' ')
@@ -303,6 +315,7 @@ class SLURMPipelineRunner(PipelineRunner):
         """
         with open(os.path.join(self._outdir, 'hierarchyevaljob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='hierarchyeval')
+            self._write_directory_check(f, self._hierarchy_eval_dir)
             f.write('cellmaps_hierarchyevalcmd.py ' + self._hierarchy_eval_dir + ' --hierarchy_dir ' +
                     self._hierarchy_dir)
             f.write(' -vvvv\n')
