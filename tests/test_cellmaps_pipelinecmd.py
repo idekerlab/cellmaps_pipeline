@@ -24,14 +24,14 @@ class TestCellmaps_pipeline(unittest.TestCase):
         """Tests parse arguments"""
         res = cellmaps_pipelinecmd._parse_arguments('hi', ['outdir'])
 
-        self.assertEqual(res.verbose, 0)
+        self.assertEqual(res.verbose, 1)
         self.assertEqual('outdir', res.outdir)
         self.assertEqual(res.logconf, None)
 
         someargs = ['-vv', '--logconf', 'hi', 'outdir']
         res = cellmaps_pipelinecmd._parse_arguments('hi', someargs)
 
-        self.assertEqual(res.verbose, 2)
+        self.assertEqual(res.verbose, 3)
         self.assertEqual(res.logconf, 'hi')
         self.assertEqual('outdir', res.outdir)
 
