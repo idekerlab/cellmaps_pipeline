@@ -47,5 +47,12 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
+.. note::
+    Due to the large number of dependent packages, we suggest a virtual environment like Anaconda_
+    set to Python_ 3.8 like so: ``conda create -n cellmaps_env python=3.8``
+
+
 .. _Github repo: https://github.com/idekerlab/cellmaps_pipeline
 .. _tarball: https://github.com/idekerlab/cellmaps_pipeline/tarball/master
+.. _Python:  https://python.org
+.. _Anaconda: https://www.anaconda.com
