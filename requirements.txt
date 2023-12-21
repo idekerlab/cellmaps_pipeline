@@ -1,5 +1,5 @@
 cellmaps_utils==0.1.0a21
-cellmaps_imagedownloader==0.1.0a16
+cellmaps_imagedownloader==0.1.0a17
 cellmaps_ppidownloader==0.1.0a8
 cellmaps_image_embedding==0.1.0a13
 cellmaps_ppi_embedding==0.1.0a9
