@@ -15,6 +15,7 @@ Cell Maps Pipeline
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
+* Source code: https://github.com/idekerlab/cellmaps_pipeline
 
 Dependencies
 ------------
