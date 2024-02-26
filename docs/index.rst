@@ -30,7 +30,7 @@ Overview of Cell Maps Pipeline
 
 
 * Free software: MIT license
-
+* Source code: https://github.com/idekerlab/cellmaps_pipeline
 
 Tools
 ^^^^^^
