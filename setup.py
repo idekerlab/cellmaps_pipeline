@@ -27,14 +27,14 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['cellmaps_utils==0.1.0a22',
-                'cellmaps_imagedownloader==0.1.0a17',
-                'cellmaps_ppidownloader==0.1.0a8',
-                'cellmaps_image_embedding==0.1.0a13',
-                'cellmaps_ppi_embedding==0.1.0a9',
-                'cellmaps_coembedding==0.1.0a10',
-                'cellmaps_generate_hierarchy==0.1.0a14',
-                'cellmaps_hierarchyeval==0.1.0a4',
+requirements = ['cellmaps_utils==0.2.0',
+                'cellmaps_imagedownloader==0.1.0',
+                'cellmaps_ppidownloader==0.1.0',
+                'cellmaps_image_embedding==0.1.0',
+                'cellmaps_ppi_embedding==0.1.0',
+                'cellmaps_coembedding==0.1.0',
+                'cellmaps_generate_hierarchy==0.1.0a17',
+                'cellmaps_hierarchyeval==0.1.0a6',
                 'networkx>=2.8,<2.9',
                 'tqdm']
 
