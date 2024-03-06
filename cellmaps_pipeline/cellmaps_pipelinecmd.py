@@ -156,6 +156,9 @@ For more information visit https://cellmaps-pipeline.readthedocs.io
                            ||
                            \/
                         hierarchy
+                           ||
+                           \/
+                      hierarchyeval
 
 In default mode this will create the following directories under <outdir> specified
 on the commandline:
@@ -166,6 +169,7 @@ on the commandline:
   2.image_embedding_fold1
   3.coembedding_fold1
   4.hierarchy
+  4.hierarchyeval
 
 If --fold 1 2 is passed in on the command line the directories would look like this:
 
@@ -177,6 +181,7 @@ If --fold 1 2 is passed in on the command line the directories would look like t
   3.coembedding_fold1
   3.coembedding_fold2
   4.hierarchy
+  4.hierarchyeval
 
 
 
