@@ -16,7 +16,7 @@ data from one or more sources, converts them into embeddings that
 are then coembedded and converted into an integrated interaction network from which a hierarchical
 model is derived.
 
-The pipeline invokes six tools that each create an output directory where results are
+The pipeline invokes seven tools that each create an output directory where results are
 stored and registered within `Research Object Crates (RO-Crate) <https://www.researchobject.org/ro-crate>`__ using
 the `FAIRSCAPE-cli <https://pypi.org/project/fairscape-cli>`__.
 
