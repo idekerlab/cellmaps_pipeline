@@ -303,6 +303,7 @@ class SLURMPipelineRunner(PipelineRunner):
             f.write('cellmaps_generate_hierarchycmd.py ' + self._hierarchy_dir + ' --coembedding_dirs ')
             for image_coembed_tuple in self._image_coembed_tuples:
                 f.write(image_coembed_tuple[2] + ' ')
+            f.write('--gene_node_attributes ' + self._ppi_dir + ' ' + self._image_dir + ' ')
             f.write('-vvvv\n')
             f.write('exit $?\n')
         os.chmod(os.path.join(self._outdir, 'hierarchyjob.sh'), 0o755)
@@ -505,6 +506,7 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         return CellmapsGenerateHierarchy(outdir=self._hierarchy_dir,
                                          inputdirs=coembed_dirs,
                                          ppigen=ppigen,
+                                         gene_node_attributes=[self._image_dir, self._ppi_dir],
                                          hiergen=hiergen,
                                          skip_logging=self._skip_logging,
                                          input_data_dict=self._input_data_dict,
