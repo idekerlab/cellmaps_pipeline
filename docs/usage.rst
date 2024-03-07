@@ -36,16 +36,44 @@ To use Cell Maps Pipeline in a project:
     print('Status code: ' + str(pipeline.run()))
 
 
-On the command line
----------------------
+Example usage for CM4AI data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For information invoke :code:`cellmaps_pipelinecmd.py -h`
+The cell maps pipeline requires two `RO-Crate`_ directories from `CM4AI data`_ site
 
-**Example usage for CM4AI data**
+Visit https://cm4ai.org/data, login and accept agreement
 
-Coming soon...
 
-**Example usage**
+For ImmunoFluorescent images `RO-Crate`_
+
+1) If not already there navigate to **Data** tab:
+
+   .. image:: images/datatab.png
+      :alt: Screenshot of data, cell maps, and intermediate other tabs with data selected
+
+2) On left side bar under **Name** check ``IF images`` checkbox, check ``MDA-MB-468``
+   for **Cell Line**, ``untreated`` for **Treatment**, ``chromatin`` for **Gene Set**,
+   and ``0.1 alpha`` for **Version**:
+
+   .. image:: images/if_leftsidebar.png
+      :alt: Screenshot of left side bar showing IF images, MDA-MB-468, untreated, chromatin, and 0.1 alpha boxes checked
+
+3) Click **Download** link on row:
+
+   .. image:: images/if_download.png
+      :alt: Screenshot of browser showing row of ImmunoFluorescent image dataset to download
+
+For AP-MS `RO-Crate`_
+
+1) If not already there navigate to **Data** tab
+2) On left side bar under **Name** check ``AP-MS`` checkbox, check ``MDA-MB-468``
+   for **Cell Line**, ``untreated`` for **Treatment**, ``chromatin`` for **Gene Set**,
+   and ``0.1 alpha`` for **Version**
+3) Click **Download** link on row
+
+
+Example usage using data from `Human Protein Atlas`_ and `Bioplex`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The cell maps pipeline requires the following input files for building MuSIC maps by integrating IF images with an AP-MS interaction network: 
 
@@ -60,3 +88,8 @@ The cell maps pipeline requires the following input files for building MuSIC map
    cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples examples/samples.csv --unique examples/unique.csv \
                            --baitlist examples/baitlist.tsv --edgelist examples/edgelist.tsv \
                            --provenance examples/provenance.json
+
+.. _CM4AI data: https://cm4ai.org/data
+.. _RO-Crate: https://www.researchobject.org/ro-crate/
+.. _Human Protein Atlas: https://www.proteinatlas.org
+.. _Bioplex: https://bioplex.hms.harvard.edu
