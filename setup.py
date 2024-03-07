@@ -33,7 +33,7 @@ requirements = ['cellmaps_utils==0.2.0',
                 'cellmaps_image_embedding==0.1.0',
                 'cellmaps_ppi_embedding==0.1.0',
                 'cellmaps_coembedding==0.1.0',
-                'cellmaps_generate_hierarchy==0.1.0a17',
+                'cellmaps_generate_hierarchy==0.1.0a18',
                 'cellmaps_hierarchyeval==0.1.0a6',
                 'networkx>=2.8,<2.9',
                 'tqdm']
