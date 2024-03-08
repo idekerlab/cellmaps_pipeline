@@ -37,7 +37,8 @@ import cellmaps_pipeline
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
               'sphinx.ext.autosectionlabel',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'sphinx_copybutton']
 
 # intersphinx mapping
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None),
