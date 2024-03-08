@@ -2,12 +2,27 @@
 Usage
 =====
 
-This page should provide information on how to use cellmaps_pipeline
+This page provides information on how to use `cellmaps_pipeline`_
 
-In a project
---------------
 
-To use Cell Maps Pipeline in a project:
+Usage via command line
+-----------------------
+
+The pipeline provides a command line tool ``cellmaps_pipelinecmd.py`` that can run
+the pipeline serially or in parallel via `SLURM`_ For more information run the following:
+
+.. code-block:: python
+
+    cellmaps_pipelinecmd.py -h
+
+Usage programmatically
+-----------------------
+
+The pipeline can be invoked programmatically to run all the steps in the pipeline
+serially via the :py:class:`~cellmaps_pipeline.runner.ProgrammaticPipelineRunner` as seen
+in the example below,
+or via `SLURM`_ using :py:class:`~cellmaps_pipeline.runner.SLURMPipelineRunner`
+
 
 .. code-block:: python
 
@@ -36,60 +51,20 @@ To use Cell Maps Pipeline in a project:
     print('Status code: ' + str(pipeline.run()))
 
 
-Example usage for CM4AI data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-The cell maps pipeline requires two `RO-Crate`_ directories from `CM4AI data`_ site
+   provenance
+   cm4ai
+   hpa_bioplex
+   ndex_save
 
-Visit https://cm4ai.org/data, login and accept agreement
-
-
-For ImmunoFluorescent images `RO-Crate`_
-
-1) If not already there navigate to **Data** tab:
-
-   .. image:: images/datatab.png
-      :alt: Screenshot of data, cell maps, and intermediate other tabs with data selected
-
-2) On left side bar under **Name** check ``IF images`` checkbox, check ``MDA-MB-468``
-   for **Cell Line**, ``untreated`` for **Treatment**, ``chromatin`` for **Gene Set**,
-   and ``0.1 alpha`` for **Version**:
-
-   .. image:: images/if_leftsidebar.png
-      :alt: Screenshot of left side bar showing IF images, MDA-MB-468, untreated, chromatin, and 0.1 alpha boxes checked
-
-3) Click **Download** link on row:
-
-   .. image:: images/if_download.png
-      :alt: Screenshot of browser showing row of ImmunoFluorescent image dataset to download
-
-For AP-MS `RO-Crate`_
-
-1) If not already there navigate to **Data** tab
-2) On left side bar under **Name** check ``AP-MS`` checkbox, check ``MDA-MB-468``
-   for **Cell Line**, ``untreated`` for **Treatment**, ``chromatin`` for **Gene Set**,
-   and ``0.1 alpha`` for **Version**
-3) Click **Download** link on row
-
-
-Example usage using data from `Human Protein Atlas`_ and `Bioplex`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The cell maps pipeline requires the following input files for building MuSIC maps by integrating IF images with an AP-MS interaction network: 
-
-1) samples file: CSV file with list of IF images to download (see sample samples file in examples folder)
-2) unique file: CSV file of unique samples (see sample unique file in examples folder)
-3) bait list file: TSV file of baits used for AP-MS experiments
-4) edge list file: TSV file of edges for protein interaction network
-5) provenance: file containing provenance information about input files in JSON format (see sample provenance file in examples folder)
-
-.. code-block::
-
-   cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples examples/samples.csv --unique examples/unique.csv \
-                           --baitlist examples/baitlist.tsv --edgelist examples/edgelist.tsv \
-                           --provenance examples/provenance.json
 
 .. _CM4AI data: https://cm4ai.org/data
 .. _RO-Crate: https://www.researchobject.org/ro-crate/
 .. _Human Protein Atlas: https://www.proteinatlas.org
 .. _Bioplex: https://bioplex.hms.harvard.edu
+.. _cellmaps_pipeline: https://github.com/idekerlab/cellmaps_pipeline
+.. _JSON: https://www.json.org/json-en.html
+.. _SLURM: https://slurm.schedmd.com/documentation.html
