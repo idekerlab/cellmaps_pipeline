@@ -5,8 +5,8 @@ Example usage for CM4AI data
 The cell maps pipeline requires two `RO-Crate`_ directories from `CM4AI data`_ site
 
 
-Step 1) Get data
-------------------
+Step 1) Get data from `CM4AI`_ site
+-------------------------------------
 
 Visit https://cm4ai.org/data, login and accept agreement
 
@@ -51,13 +51,13 @@ For AP-MS `RO-Crate`_
       :alt: Screenshot of browser showing row of AP-MS dataset to download
 
 
-Step 2) Uncompress data
--------------------------
+Step 2) Uncompress downloaded data from `CM4AI`_ site
+-------------------------------------------------------
 
 The above steps will download two files:
 
-* `cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha.tar.gz` containing the AP-MS dataset
-* `cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha.tar.gz` containing ImmunoFluorescent image dataset
+* ``cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha.tar.gz`` containing the AP-MS dataset
+* ``cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha.tar.gz`` containing ImmunoFluorescent image dataset
 
 These files need to be `untarred`_ and gunzipped to be used by the `cellmaps_pipeline`_
 
@@ -66,17 +66,21 @@ Easiest way to do this on Linux/Mac is to open and terminal and run the followin
 
 .. code-block:: python
 
-    # change to directory where downloaded files reside
     tar -zxf cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha.tar.gz
     tar -zxf cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha.tar.gz
 
+.. note::
 
- Step 3) Run the pipeline
----------------------------
+    Before running above command be sure to change to directory where those files reside
 
-TODO...
+
+Step 3) Run the `cellmaps_pipeline`_ on `CM4AI`_ data
+---------------------------------------------------------
+
+ TODO
 
 .. _CM4AI data: https://cm4ai.org/data
+.. _CM4AI: https://cm4ai.org
 .. _RO-Crate: https://www.researchobject.org/ro-crate/
 .. _Human Protein Atlas: https://www.proteinatlas.org
 .. _Bioplex: https://bioplex.hms.harvard.edu
