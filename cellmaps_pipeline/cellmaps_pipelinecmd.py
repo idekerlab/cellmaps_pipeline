@@ -84,6 +84,10 @@ def _parse_arguments(desc, args):
                              'a value of 0.1 means to generate PPI input network using the '
                              'top ten percent of coembedding entries. Each cutoff generates '
                              'another PPI network')
+    parser.add_argument('--example_provenance', action='store_true',
+                        help='If set, output example provenance to standard out and exit')
+    parser.add_argument('--example_registered_provenance', action='store_true',
+                        help='If set, output example provenance for FAIRSCAPE registered datasets')
     parser.add_argument('--provenance',
                         help='Path to file containing provenance '
                              'information about input files in JSON format. '
@@ -184,7 +188,6 @@ If --fold 1 2 is passed in on the command line the directories would look like t
   4.hierarchyeval
 
 
-
 In addition, the --provenance flag is required and must be set to a path
 to a JSON file.
 
@@ -207,6 +210,24 @@ Additional optional fields for registering datasets include
 
     try:
         logutils.setup_cmd_logging(theargs)
+
+        if theargs.example_provenance is True:
+            logger.debug('Outputting example provenance to standard out')
+            register = CellmapsPPIDownloader.get_example_provenance()
+            register.update(CellmapsImageDownloader.get_example_provenance())
+            sys.stdout.write(json.dumps(register, indent=2))
+            sys.stdout.write('\n')
+            sys.stdout.flush()
+            return 0
+        if theargs.example_registered_provenance is True:
+            logger.debug('Outputting example provenance with registered '
+                         'datasets to standard out')
+            register = CellmapsPPIDownloader.get_example_provenance(with_ids=True)
+            register.update(CellmapsImageDownloader.get_example_provenance(with_ids=True))
+            sys.stdout.write(json.dumps(register, indent=2))
+            sys.stdout.write('\n')
+            sys.stdout.flush()
+            return 0
 
         if theargs.provenance is None:
             sys.stderr.write('\n\n--provenance flag is required to run this tool. '
