@@ -83,9 +83,12 @@ Step 3) Run the `cellmaps_pipeline`_ on `CM4AI`_ data
     # be sure to update pipe_prov.json file
 
     cellmaps_pipelinecmd.py  --provenance pipe_prov.json \
-                            --fake \
                             --cm4ai_apms cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha/apms.tsv \
                             --cm4ai_image cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha/MDA-MB-468_untreated_antibody_gene_table.tsv
+
+.. note::
+
+    Above command may fail to run on machines with 16gb of ram or less
 
 
 .. _CM4AI data: https://cm4ai.org/data
