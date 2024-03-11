@@ -74,9 +74,11 @@ via this command line invocation:
 
 **Or**, if input datasets are already registered with FAIRSCAPE
 
-.. code-block:: python
+TODO
 
-    cellmaps_pipelinecmd.py . --example_registered_provenance > provenance.json
+.. note::
+
+    FAIRSCAPE registration documentation is coming soon...
 
 .. _CM4AI data: https://cm4ai.org/data
 .. _RO-Crate: https://www.researchobject.org/ro-crate/
