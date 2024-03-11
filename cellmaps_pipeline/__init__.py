@@ -4,6 +4,6 @@
 
 __author__ = 'Cell Maps team'
 __email__ = 'tools@cm4ai.org'
-__version__ = '0.1.0a18'
+__version__ = '0.1.0a19'
 __repo_url__ = 'https://github.com/idekerlab/cellmaps_pipeline'
 __description__ = 'Runs full Cell Maps pipeline'
