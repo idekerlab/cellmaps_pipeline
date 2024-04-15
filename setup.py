@@ -27,7 +27,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['cellmaps_utils==0.2.0',
+requirements = ['cellmaps_utils==0.3.0a1',
                 'cellmaps_imagedownloader==0.1.0',
                 'cellmaps_ppidownloader==0.1.0',
                 'cellmaps_image_embedding==0.1.0',
