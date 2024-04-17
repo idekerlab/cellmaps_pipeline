@@ -35,7 +35,7 @@ requirements = ['scipy<1.13.0',
                 'cellmaps_ppi_embedding==0.2.0',
                 'cellmaps_coembedding==0.1.0',
                 'cellmaps_generate_hierarchy==0.1.0a20',
-                'cellmaps_hierarchyeval==0.1.0a7',
+                'cellmaps_hierarchyeval==0.1.0a8',
                 'networkx>=2.8,<2.9',
                 'tqdm']
 
