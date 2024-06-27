@@ -139,7 +139,7 @@ Instruction for running :code:`cellmaps_pipeline` on your data can be found `her
 
    cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples examples/samples.csv --unique examples/unique.csv --edgelist examples/edgelist.tsv --baitlist examples/baitlist.tsv --provenance examples/provenance.json
 
-**Expected run time for demo**:
+**Expected run time for demo**: ~55min (macOS: Ventura 13.5, M2 Processor)
 
 Via Docker
 ~~~~~~~~~~~~~~~~~~~~~~
