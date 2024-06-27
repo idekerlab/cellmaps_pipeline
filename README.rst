@@ -20,22 +20,43 @@ Cell Maps Pipeline
 Dependencies
 ------------
 
-* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__
-* `cellmaps_imagedownloader <https://pypi.org/project/cellmaps-imagedownloader>`__
-* `cellmaps_ppidownloader <https://pypi.org/project/cellmaps-ppidownloader>`__
-* `cellmaps_image_embedding <https://pypi.org/project/cellmaps-image-embedding>`__
-* `cellmaps_ppi_embedding <https://pypi.org/project/cellmaps-ppi-embedding/>`__
-* `cellmaps_coembedding <https://pypi.org/project/cellmaps-coembedding>`__
-* `cellmaps_generate_hierarchy <https://pypi.org/project/cellmaps-generate-hierarchy>`__
-* `networkx <https://pypi.org/project/networkx>`__
+* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__ (v. 0.3.0a1)
+* `cellmaps_imagedownloader <https://pypi.org/project/cellmaps-imagedownloader>`__ (v. 0.1.0)
+* `cellmaps_ppidownloader <https://pypi.org/project/cellmaps-ppidownloader>`__ (v. 0.1.0)
+* `cellmaps_image_embedding <https://pypi.org/project/cellmaps-image-embedding>`__ (v. 0.1.0)
+* `cellmaps_ppi_embedding <https://pypi.org/project/cellmaps-ppi-embedding/>`__ (v. 0.2.0)
+* `cellmaps_coembedding <https://pypi.org/project/cellmaps-coembedding>`__ (v. 0.1.0)
+* `cellmaps_generate_hierarchy <https://pypi.org/project/cellmaps-generate-hierarchy>`__ (v. 0.1.0a20)
+* `cellmaps_hierarchyeval <https://pypi.org/project/cellmaps-hierarchyeval>`__ (v. 0.1.0a8)
+* `networkx <https://pypi.org/project/networkx>`__ (v. >=2.8,<2.9)
+* `scipy <https://pypi.org/project/scipy>`__ (v. <1.13.0)
+* `tqdm <https://pypi.org/project/tqdm>`__ (v. 4.66.2)
 
 Compatibility
 -------------
 
 * Python 3.8+
 
+
+OS Requirements
+----------------
+This package is supported for macOS and Linux. The package has been tested on the following systems:
+
+* macOS: Ventura (13.5)
+
+* Linux: Rocky Linux 8
+
+
 Installation
 ------------
+
+**Install from PyPi**
+
+.. code-block::
+
+    pip install cellmaps_pipeline
+
+**Install from Github**
 
 .. code-block::
 
