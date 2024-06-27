@@ -93,6 +93,8 @@ Output:
    dockerbuild          build docker image and store in local repository
    dockerpush           push image to dockerhub
 
+**Expected install time**: ~30-40s
+
 For developers
 -------------------------------------------
 
@@ -129,12 +131,15 @@ Usage
 
 For information invoke :code:`cellmaps_pipelinecmd.py -h`
 
-**Example usage**
+Instruction for running :code:`cellmaps_pipeline` on your data can be found `here <https://cellmaps-pipeline.readthedocs.io/en/latest/usage.html>`__.
+
+**Example usage (Demo)**
 
 .. code-block::
 
    cellmaps_pipelinecmd.py ./cellmaps_pipeline_outdir --samples examples/samples.csv --unique examples/unique.csv --edgelist examples/edgelist.tsv --baitlist examples/baitlist.tsv --provenance examples/provenance.json
 
+**Expected run time for demo**:
 
 Via Docker
 ~~~~~~~~~~~~~~~~~~~~~~
