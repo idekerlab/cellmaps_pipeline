@@ -1,4 +1,5 @@
 Sphinx>=1.8.1
 sphinx-rtd-theme
 sphinx-copybutton
-
+cellmaps_utils==0.3.0a1
+networkx>=2.8,<2.9
