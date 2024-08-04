@@ -117,7 +117,12 @@ def _parse_arguments(desc, args):
 
 def main(args):
     """
-    Main entry point for program
+    Main entry point for program.
+    The Cell Maps Pipeline takes ImmunoFluorescent images from the Human Protein
+    Atlas along with Affinity Purification Mass Spectrometry data from one or
+    more sources, converts them into embeddings that are then co-embedded and
+    converted into an integrated interaction network from which a hierarchical
+    model is derived.
 
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list

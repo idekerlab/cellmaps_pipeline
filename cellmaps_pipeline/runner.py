@@ -44,20 +44,26 @@ logger = logging.getLogger(__name__)
 
 class PipelineRunner(object):
     """
-    Base command runner
+    Base class for running pipeline commands in a generic execution environment.
+    This class should be subclassed to provide specific implementations for different
+    execution environments such as local or SLURM-based clusters.
     """
 
     def __init__(self, outdir):
         """
         Constructor
+
+        :param outdir: The output directory where all pipeline generated files will be stored.
         """
         self._outdir = os.path.abspath(outdir)
 
     def _get_image_coembed_tuples(self, fold):
         """
+        Generate tuples containing fold number and directories for image embedding and coembedding.
 
-        :param fold:
-        :return:
+        :param fold: List of integers representing the folds of the data.
+        :return: A list of tuples, each containing the fold number, image embedding directory,
+                 and coembedding directory paths.
         """
         if fold is None:
             raise CellmapsPipelineError('Fold cannot be None')
@@ -80,10 +86,9 @@ class PipelineRunner(object):
 
     def run(self):
         """
-        Runs pipeline
-        :param cmd:
-        :raises NotImplementedError: Always raised cause
-                                     subclasses need to implement
+        Abstract method to run the pipeline. This method should be implemented by subclasses.
+
+        :raises NotImplementedError: If the subclass does not implement this method.
         """
         raise NotImplementedError('subclasses need to implement')
 
@@ -111,20 +116,22 @@ class SLURMPipelineRunner(PipelineRunner):
                  slurm_partition=None,
                  slurm_account=None):
         """
-
-        :param outdir:
-        :param samples:
-        :param unique:
-        :param edgelist:
-        :param baitlist:
-        :param model_path:
-        :param proteinatlasxml:
-        :param ppi_cutoffs:
-        :param fake:
-        :param provenance:
-        :param provenance_utils:
-        :param fold:
-        :param input_data_dict:
+        :param outdir: Path to the output directory.
+        :param cm4ai_apms: Path to the CM4AI APMS data file.
+        :param cm4ai_image: Path to the CM4AI image data file.
+        :param samples: Path to the samples data file.
+        :param unique: Path to the unique data file.
+        :param edgelist: Path to the edge list file for PPI data.
+        :param baitlist: Path to the bait list file for PPI data.
+        :param model_path: Path to the pre-trained model for embedding generation.
+        :param proteinatlasxml: Path to the Protein Atlas XML data.
+        :param ppi_cutoffs: Cutoff thresholds for PPI data filtering.
+        :param fake: Boolean indicating whether to use fake data embedding for testing.
+        :param provenance: Path to the provenance data file.
+        :param fold: Data folds to process.
+        :param input_data_dict: Dictionary of input data configurations.
+        :param slurm_partition: Name of the SLURM partition to submit jobs to.
+        :param slurm_account: SLURM account name for job submission.
         """
         super().__init__(outdir=outdir)
         self._cm4ai_apms = cm4ai_apms if cm4ai_apms is None or os.path.isabs(cm4ai_apms) else os.path.join(os.getcwd(),
@@ -166,12 +173,13 @@ class SLURMPipelineRunner(PipelineRunner):
                                 mem='32G', cpus_per_task='4',
                                 job_name='cellmaps_pipeline'):
         """
+        Writes SLURM job directives to a bash script file.
 
-        :param time:
-        :param mem:
-        :param cpus_per_task:
-        :param job_name:
-        :return:
+        :param out: File handle to write the SLURM directives.
+        :param allocated_time: String specifying the maximum time allowed for the job.
+        :param mem: String specifying the memory allocated for the job.
+        :param cpus_per_task: String specifying the number of CPUs per task.
+        :param job_name: String specifying the name of the SLURM job.
         """
         out.write('#!/bin/bash\n\n')
         out.write('#SBATCH --job-name=' + str(job_name) + '\n')
@@ -191,6 +199,12 @@ class SLURMPipelineRunner(PipelineRunner):
         out.write('echo $HOSTNAME\n')
 
     def _write_directory_check(self, out, directory):
+        """
+        Writes a directory check script to the provided file handle, which exits the job if the directory exists.
+
+        :param out: File handle to write the directory check script.
+        :param directory: The directory to check for existence.
+        """
         out.write(f"if [ -d \"{directory}\" ]; then\n")
         out.write(f"    echo \"Directory {directory} exists. Skipping job.\"\n")
         out.write("    exit 0\n")
@@ -198,8 +212,9 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_download_images_command(self):
         """
-        Creates command to download images
-        :return:
+        Generates a bash script for downloading images and writes it to a file in the output directory.
+
+        :return: The filename of the bash script generated for downloading images.
         """
         with open(os.path.join(self._outdir, 'imagedownloadjob.sh'), 'w') as f:
             self._write_slurm_directives(out=f, job_name='imagedownload')
@@ -222,7 +237,8 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_download_ppi_command(self):
         """
-        Creates command to download ppi
+        Generates a bash script for downloading protein-protein interactions (PPI) data and writes it to a file in the output directory.
+
         :return: ppidownloadjob.sh
         """
         with open(os.path.join(self._outdir, 'ppidownloadjob.sh'), 'w') as f:
@@ -246,8 +262,10 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_embed_image_command(self, fold=1):
         """
-        Creates command to generate image embedding
-        :return: imageembedjob.sh
+        Generates a bash script for embedding images based on the specified fold and writes it to a file in the output directory.
+
+        :param fold: The data fold to process for image embedding.
+        :return: The filename of the bash script generated for image embedding.
         """
         filename = 'imageembedjob' + str(fold) + '.sh'
         with open(os.path.join(self._outdir, filename), 'w') as f:
@@ -262,7 +280,8 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_embed_ppi_command(self):
         """
-        Creates command to generate ppi embedding
+        Generates a bash script for embedding PPI data and writes it to a file in the output directory.
+
         :return: ppiembedjob.sh
         """
         with open(os.path.join(self._outdir, 'ppiembedjob.sh'), 'w') as f:
@@ -277,7 +296,9 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_coembed_command(self, fold=1):
         """
-        Creates command to generate coembedding
+        Generates a bash script for co-embedding of image and PPI data based on the specified fold and writes it to a file in the output directory.
+
+        :param fold: The data fold to process for co-embedding.
         :return: coembedjob.sh
         """
         filename = 'coembeddingjob' + str(fold) + '.sh'
@@ -294,7 +315,7 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_hierarchy_command(self):
         """
-        Creates command to generate hierarchy
+        Generates a bash script for constructing a hierarchy from the co-embedded data.
         :return: hierarchyjob.sh
         """
         with open(os.path.join(self._outdir, 'hierarchyjob.sh'), 'w') as f:
@@ -311,7 +332,7 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def _generate_hierarchyeval_command(self):
         """
-        Creates command to perform hierarchy evaluation
+        Generates a bash script for evaluating the generated hierarchy.
         :return: hierarchyevaljob.sh
         """
         with open(os.path.join(self._outdir, 'hierarchyevaljob.sh'), 'w') as f:
@@ -326,10 +347,7 @@ class SLURMPipelineRunner(PipelineRunner):
 
     def run(self):
         """
-        Runs pipeline
-        :param cmd:
-        :raises NotImplementedError: Always raised cause
-                                     subclasses need to implement
+        Runs pipelines
         """
         slurmjobfile = os.path.join(self._outdir, 'slurm_cellmaps_job.sh')
         with open(slurmjobfile, 'w') as f:
@@ -399,6 +417,23 @@ class ProgrammaticPipelineRunner(PipelineRunner):
                  input_data_dict=None):
         """
         Constructor
+
+        :param outdir: Output directory for results and logs.
+        :param cm4ai_apms: Path to CM4AI AP-MS data.
+        :param cm4ai_image: Path to CM4AI image data.
+        :param samples: Path to samples data.
+        :param unique: Path to unique data.
+        :param edgelist: Path to the network edge list.
+        :param baitlist: Path to the bait list.
+        :param model_path: Path to the model used for embedding.
+        :param proteinatlasxml: Path to the ProteinAtlas XML data.
+        :param ppi_cutoffs: Cutoff thresholds for PPI data processing.
+        :param fake: Uses fake embeddings for testing purposes.
+        :param provenance: Provenance information for reproducibility.
+        :param skip_logging: Skips logging of pipeline steps if True.
+        :param provenance_utils: Utility for handling provenance data.
+        :param fold: List of fold of image data.
+        :param input_data_dict: Dictionary containing input data configurations.
         """
         super().__init__(outdir=outdir)
         self._cm4ai_amps = cm4ai_apms
@@ -433,10 +468,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
     def run(self):
         """
         Runs pipeline programmatically in serial steps. This would
-        be the same as running the steps in a notebook
+        be the same as running the steps in a notebook.
 
-        :raises CellmapsPipelineError: if command returns non zero value
-
+        :raises CellmapsPipelineError: If any step in the pipeline fails, indicating the step and reason.
+        :return: Exit code 0 if successful, other values indicate failure.
         """
         if self._download_images() != 0:
             raise CellmapsPipelineError('Image download failed')
@@ -463,8 +498,9 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _hierarchy_eval(self):
         """
+        Evaluates the hierarchy.
 
-        :return:
+        :return: Exit code 0 if successful, or if the directory already exists.
         """
         if os.path.isdir(self._hierarchy_eval_dir):
             warnings.warn(
@@ -478,8 +514,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _hierarchy(self):
         """
+        Generates a hierarchical structure of co-embedded data.
 
-        :return:
+        :return: Exit code 0 if hierarchy generation is successful or skipped, otherwise logs an error.
+        :rtype: int
         """
         if os.path.isdir(self._hierarchy_dir):
             warnings.warn(
@@ -514,8 +552,11 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _coembed(self):
         """
+        Performs co-embedding of image and PPI data, using either a real or fake data generator based on configuration.
 
-        :return:
+        :return: Exit code 0 if co-embedding is successful or previously completed,
+                 otherwise logs an error and returns non-zero.
+        :rtype: int
         """
         for image_coembed_tuple in self._image_coembed_tuples:
             if os.path.isdir(image_coembed_tuple[2]):
@@ -546,8 +587,11 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _embed_image(self):
         """
+        Embeds image data using a specified model, typically a Densenet model.
 
-        :return:
+        :return: Exit code 0 if the embedding is successful or already completed,
+                 otherwise it logs an error and returns non-zero.
+        :rtype: int
         """
         for image_coembed_tuple in self._image_coembed_tuples:
             if os.path.isdir(image_coembed_tuple[1]):
@@ -577,8 +621,10 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _embed_ppi(self):
         """
+        Embeds the protein-protein interaction data using the Node2Vec algorithm.
 
-        :return:
+        :return: Exit code 0 if the directory exists or embedding is successful, otherwise logs an error.
+        :rtype: int
         """
         if os.path.isdir(self._ppi_embed_dir):
             warnings.warn(
@@ -596,8 +642,12 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
     def _download_ppi(self):
         """
+        Downloads protein-protein interaction (PPI) data. This method handles the determination of data sources
+        and ensures that data is downloaded only once by checking the presence of the target directory.
 
-        :return:
+        :return: Exit code 0 if the directory exists or download is successful,
+                 otherwise it continues to handle or log the error.
+        :rtype: int
         """
         if os.path.isdir(self._ppi_dir):
             warnings.warn('Found ppi dir, assuming we are good. skipping')
@@ -685,7 +735,8 @@ class ProgrammaticPipelineRunner(PipelineRunner):
 
 class CellmapsPipeline(object):
     """
-    Class to run algorithm
+    Manages the execution of the Cellmaps pipeline. This class is responsible for setting up the environment,
+    executing the runner, and handling the logging and cleanup tasks associated with the pipeline execution.
     """
 
     def __init__(self, outdir=None,
@@ -694,8 +745,10 @@ class CellmapsPipeline(object):
         """
         Constructor
 
-        :param exitcode: value to return via :py:meth:`.CellmapsPipeline.run` method
-        :type int:
+        :param outdir: The directory where the pipeline's output will be stored.
+        :param runner: The runner object responsible for executing the pipeline steps.
+        :param input_data_dict: A dictionary of input data settings that may affect pipeline execution.
+        :raises CellmapsPipelineError: If the output directory is not provided, it raises an error.
         """
         if outdir is None:
             raise CellmapsPipelineError('outdir is None')
@@ -708,10 +761,11 @@ class CellmapsPipeline(object):
 
     def run(self):
         """
-        Runs CM4AI Pipeline
+        Runs CM4AI Pipeline. This method ensures that all steps are logged and any
+        exceptions are caught, and the final status is returned.
 
-
-        :return:
+        :return: The exit status of the pipeline run. Returns 0 if successful, otherwise returns an error code.
+        :rtype: int
         """
         logger.debug('In run method')
 
