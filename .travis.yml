@@ -1,7 +1,7 @@
 # Config file for automatic testing at travis-ci.org
 
 language: python
-dist: bionic
+dist: focal
 python:
   - "3.11"
   - "3.10"
@@ -16,8 +16,8 @@ install:
 
 # Command to run tests, e.g. python setup.py test
 script:
-    - coverage run --source cellmaps_pipeline setup.py test
+    - coverage run --source cellmaps_pipeline -m unittest discover
 
 after_success: coveralls
 
-    
+
