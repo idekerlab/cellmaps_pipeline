@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
+import os.path
 import sys
 import logging
 import logging.config
@@ -10,6 +11,8 @@ from cellmaps_utils import logutils
 from cellmaps_utils import constants
 from cellmaps_imagedownloader.runner import CellmapsImageDownloader
 from cellmaps_ppidownloader.runner import CellmapsPPIDownloader
+
+from cellmaps_pipeline.exceptions import CellmapsPipelineError
 from cellmaps_pipeline.runner import ProgrammaticPipelineRunner
 from cellmaps_pipeline.runner import SLURMPipelineRunner
 import cellmaps_pipeline
@@ -248,6 +251,15 @@ Additional optional fields for registering datasets include
         # load the provenance as a dict
         with open(theargs.provenance, 'r') as f:
             json_prov = json.load(f)
+
+        if theargs.cm4ai_image is not None:
+            if not os.path.exists(theargs.cm4ai_image) or not os.path.isfile(theargs.cm4ai_image):
+                raise CellmapsPipelineError(f'Incorrect path was set for cm4ai_image. '
+                                            f'File under path {theargs.cm4ai_image} does not exist.')
+        if theargs.cm4ai_apms is not None:
+            if not os.path.exists(theargs.cm4ai_apms) or not os.path.isfile(theargs.cm4ai_apms):
+                raise CellmapsPipelineError(f'Incorrect path was set for cm4ai_apms. '
+                                            f'File under path {theargs.cm4ai_apms} does not exist.')
 
         if theargs.slurm is True:
             runner = SLURMPipelineRunner(outdir=theargs.outdir,
