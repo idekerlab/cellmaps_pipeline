@@ -1,6 +1,7 @@
 ===================
 Cell Maps Pipeline
 ===================
+The Cell Maps Pipeline is part of the Cell Mapping Toolkit
 
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_pipeline.svg
