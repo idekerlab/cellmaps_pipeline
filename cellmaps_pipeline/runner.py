@@ -687,13 +687,14 @@ class ProgrammaticPipelineRunner(PipelineRunner):
         if self._cm4ai_image is not None:
             converter = CM4AITableConverter(cm4ai=self._cm4ai_image)
             samples_list, unique_list = converter.get_samples_and_unique_lists()
-        elif self._samples is not None and self._unique is not None:
+        elif self._samples is not None:
             samples_list = ImageGeneNodeAttributeGenerator.get_samples_from_csvfile(self._samples)
-            unique_list = ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique)
+            unique_list = None
+            if self._unique is not None:
+                unique_list = ImageGeneNodeAttributeGenerator.get_unique_list_from_csvfile(self._unique)
         else:
             raise CellMapsImageDownloaderError("Parameters --samples and "
-                                               "--unique or --cm4ai_apms and "
-                                               "--cm4ai_image must be "
+                                               "or --cm4ai_image must be "
                                                "provided.")
 
         imagegen = ImageGeneNodeAttributeGenerator(unique_list=unique_list,
