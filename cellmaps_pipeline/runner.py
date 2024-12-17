@@ -221,11 +221,13 @@ class SLURMPipelineRunner(PipelineRunner):
             self._write_directory_check(f, self._image_dir)
             if self._cm4ai_image != None:
                 input_arg = '--cm4ai_table ' + self._cm4ai_image
-            elif self._samples != None and self._unique != None:
-                input_arg = '--samples ' + self._samples + ' --unique ' + self._unique
+            elif self._samples != None:
+                input_arg = '--samples ' + self._samples
+                if self._unique is not None:
+                    input_arg = input_arg + ' --unique ' + self._unique
             else:
                 raise CellmapsPipelineError(
-                    'You must provide cm4ai_table parameter or samples and unque parameters.')
+                    'You must provide cm4ai_table parameter or samples parameter.')
             if self._provenance == None:
                 raise CellmapsPipelineError(
                     'You must provide provenance parameter')
