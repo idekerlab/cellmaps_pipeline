@@ -37,7 +37,7 @@ requirements = ['scipy<1.13.0',
                 'cellmaps_generate_hierarchy == 0.2.2',
                 'cellmaps_hierarchyeval == 0.2.0',
                 'networkx>=2.8,<2.9',
-                'tqdm']
+                'tqdm>=4.66,<4.67']
 
 setup_requirements = [ ]
 
