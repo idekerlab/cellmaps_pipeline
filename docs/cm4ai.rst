@@ -18,7 +18,7 @@ For ImmunoFluorescent images `RO-Crate`_
 
 1) Click on the Files tab, and use regex expression to search for ``*ifimage*``. List of data bundles with IF images
 will be displayed. Check the name of the bundle to identify the treatment, cell line, and any other relevant
-information.
+information. For this example with download images for ``paclitaxel`` treatment.
 
    .. image:: images/searchifimage.png
       :alt: IF images files in dataverse
@@ -75,9 +75,7 @@ Step 3) Run the `cellmaps_pipeline`_ on `CM4AI`_ data
     cellmaps_pipelinecmd.py . --example_provenance > pipe_prov.json
     # be sure to update pipe_prov.json file
 
-    cellmaps_pipelinecmd.py  --provenance pipe_prov.json \
-                            --cm4ai_apms cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha/apms.tsv \
-                            --cm4ai_image cm4ai_chromatin_mda-mb-468_paclitaxel_ifimage_0.1_alpha/MDA-MB-468_paclitaxel_antibody_gene_table.tsv
+    cellmaps_pipelinecmd.py ./output_dir --provenance pipe_prov.json --cm4ai_apms cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha/apms.tsv --cm4ai_image cm4ai_chromatin_mda-mb-468_paclitaxel_ifimage_0.1_alpha/MDA-MB-468_paclitaxel_antibody_gene_table.tsv
 
 .. note::
 
