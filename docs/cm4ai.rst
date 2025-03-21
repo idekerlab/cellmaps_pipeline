@@ -8,8 +8,8 @@ The cell maps pipeline requires two `RO-Crate`_ directories from `CM4AI data`_ s
 Step 1) Get data from `CM4AI`_ site
 -------------------------------------
 
-Visit https://cm4ai.org/release, and click ``View Full Data Release``. You will be redirected to `UVA Dataverse` web
-page.
+Visit https://cm4ai.org/data-releases/, and pick ``CM4AI 0.5 Alpha Data Release`` release. You will be redirected
+to `UVA Dataverse` web page.
 
     .. image:: images/cm4aireleaseweb.png
       :alt: Data release site on CM4AI web page
