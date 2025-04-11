@@ -36,7 +36,7 @@ Dependencies
 Compatibility
 -------------
 
-* Python 3.8+
+* Python 3.8 - 3.11
 
 
 OS Requirements
