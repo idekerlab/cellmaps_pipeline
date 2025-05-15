@@ -143,7 +143,7 @@ def main(args):
     withguids_json = json.dumps(withguid, indent=2)
     register_json = json.dumps(register, indent=2)
 
-    desc = """
+    desc = r"""
 Version {version}
 
 The Cell Maps Pipeline takes ImmunoFluorescent images from the Human Protein

@@ -7,6 +7,7 @@ serially via the :py:class:`~cellmaps_pipeline.runner.ProgrammaticPipelineRunner
 in the example below,
 or via `SLURM`_ using :py:class:`~cellmaps_pipeline.runner.SLURMPipelineRunner`
 
+The example below runs the pipeline using example data. This may take up to an hour to run.
 
 .. code-block:: python
 
@@ -33,6 +34,12 @@ or via `SLURM`_ using :py:class:`~cellmaps_pipeline.runner.SLURMPipelineRunner`
                                 runner=runner,
                                 input_data_dict={})
     print('Status code: ' + str(pipeline.run()))
+
+.. note::
+
+   Above assumes the `repo <https://github.com/idekerlab/cellmaps_pipeline>`__ has been cloned
+   locally and the Python interpreter was run within the base directory of the repo
+
 
 .. _CM4AI data: https://cm4ai.org/data
 .. _RO-Crate: https://www.researchobject.org/ro-crate/
