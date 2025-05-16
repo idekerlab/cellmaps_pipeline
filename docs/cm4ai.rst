@@ -2,7 +2,7 @@
 Example usage for CM4AI data
 =============================
 
-Example usage using CM4AI 0.5 Alpha Data Release
+CM4AI 0.5 Alpha Data Release
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Visit `cm4ai.org <https://cm4ai.org>`__ and go to **Products -> Data Releases**
@@ -29,9 +29,12 @@ Example usage using CM4AI 0.5 Alpha Data Release
         For **untreated** dataset, click `here <https://g-9b3b6e.9ad93.a567.data.globus.org/Data/cm4ai_0.1alpha/cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha.tar.gz>`__ to download the images
         which are stored as a tarred gzip file
 
-#. Do the same as above to download the **cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha** entry
+#. Download AP-MS data
 
-#. Unzip files
+   Perform the previous step and select **cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha**
+   entry to download the AP-MS data
+
+#. Uncompress files
 
     This can be done by double clicking on the file or if on a Mac/Linux machine by running the following
     on a command line:
@@ -40,6 +43,9 @@ Example usage using CM4AI 0.5 Alpha Data Release
 
         unzip cm4ai_chromatin_mda-mb-468_paclitaxel_ifimage_0.1_alpha.zip
         unzip cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha.zip
+
+        # if using the untreated images run this to uncompress
+        tar -zxf cm4ai_chromatin_mda-mb-468_untreated_ifimage_0.1_alpha.tar.gz
 
 
 #. Running cellmaps_pipelinecmd command
@@ -52,13 +58,13 @@ Example usage using CM4AI 0.5 Alpha Data Release
 
        # Be sure to update pipe_prov.json file
 
-       cellmaps_pipelinecmd.py ./paclitaxel_run --provenance pipe_prov.json \
+       cellmaps_pipelinecmd.py ./paclitaxel_run -vvvv --provenance pipe_prov.json \
              --cm4ai_apms cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha/apms.tsv \
              --cm4ai_image cm4ai_chromatin_mda-mb-468_paclitaxel_ifimage_0.1_alpha/MDA-MB-468_paclitaxel_antibody_gene_table.tsv
 
     .. note::
 
-    Above command may fail to run on machines with 16gb of ram or less
+        Above command may fail to run on machines with 16gb of ram or less
 
 Example usage February 2025 Data Release (Beta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -82,6 +88,11 @@ Example usage February 2025 Data Release (Beta)
         For **vorinostat** dataset, look for **cm4ai-v0.6-beta-if-images-vorinostat.zip** entry and perform the same
         operations above. Same goes for untreated, look for **cm4ai-v0.6-beta-if-images-untreated.zip**
 
+#. Download AP-MS data
+
+   This release does not have an AP-MS dataset, just use the AP-MS dataset **cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha**
+   from 0.5 release documented above.
+
 #. Unzip file
 
     This can be done by double clicking on the file or if on a Mac/Linux machine by running the following
@@ -90,20 +101,27 @@ Example usage February 2025 Data Release (Beta)
     .. code-block::
 
         unzip cm4ai-v0.6-beta-if-images-paclitaxel.zip
+        unzip cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha.zip
 
 
 #. Running cellmaps_pipelinecmd command
 
     .. code-block::
 
-        # Be sure to unzip the zip file above before running this step
-        cellmaps_imagedownloadercmd.py ./paclitaxel_image  \
-            --cm4ai_table paclitaxel/manifest.csv  \
-            --provenance examples/provenance.json
+        # Be sure to unzip the zip files above before running this step
+
+       cellmaps_pipelinecmd.py . --example_provenance > pipe_prov.json
+
+       # Be sure to update pipe_prov.json file
+
+       cellmaps_pipelinecmd.py ./paclitaxel_feb2025run -vvvv --provenance pipe_prov.json \
+             --cm4ai_apms cm4ai_chromatin_mda-mb-468_untreated_apms_0.1_alpha/apms.tsv \
+             --cm4ai_image paclitaxel/manifest.csv
+
 
     .. note::
 
-    Above command may fail to run on machines with 16gb of ram or less
+        Above command may fail to run on machines with 16gb of ram or less
 
 .. _CM4AI data: https://cm4ai.org/data
 .. _CM4AI: https://cm4ai.org
