@@ -4,8 +4,8 @@ cellmaps_imagedownloader==0.3.0
 cellmaps_ppidownloader==0.2.2
 cellmaps_image_embedding==0.3.2
 cellmaps_ppi_embedding==0.4.2
-cellmaps_coembedding==1.2.2a1
-cellmaps_generate_hierarchy==0.2.4a1
-cellmaps_hierarchyeval==0.2.2a1
+cellmaps_coembedding==1.2.2
+cellmaps_generate_hierarchy==0.2.4
+cellmaps_hierarchyeval==0.2.2
 networkx>=2.8,<2.9
 tqdm>=4.66.0,<5.0.0
