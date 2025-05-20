@@ -2,7 +2,7 @@
 History
 =======
 
-1.2.0 (2025-XX-XX)
+1.2.0 (2025-05-19)
 -------------------
 * Updated dependency cellmaps_utils to `0.8.0` from `0.7.0`
 

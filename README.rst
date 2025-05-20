@@ -63,6 +63,7 @@ Installation
 
    git clone https://github.com/idekerlab/cellmaps_pipeline
    cd cellmaps_pipeline
+   pip install -r requirements_dev.txt
    make dist
    pip install dist/cellmaps_pipeline*whl
 
@@ -96,7 +97,7 @@ Output:
 
 **Expected install time**: ~30-40s
 
-Before running tests, please install ``pip install -r requirements_dev``.
+Before running tests, please install ``pip install -r requirements_dev.txt`` and ``pip install -r requirements.txt``.
 
 For developers
 -------------------------------------------
