@@ -66,22 +66,22 @@ CM4AI 0.5 Alpha Data Release
 
         Above command may fail to run on machines with 16gb of ram or less
 
-Example usage February 2025 Data Release (Beta)
+Example usage March 2025 Data Release (Beta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Visit `cm4ai.org <https://cm4ai.org>`__ and go to **Products -> Data Releases**
 
-#. Scroll down and click **February 2025 Data Release (Beta)** link (circled in red)
+#. Scroll down and click **March 2025 Data Release (Beta)** link (circled in red)
 
     .. image:: images/datarelease_0.6link.png
-        :alt: Link to CM4AI February 2025 data release circled in red
+        :alt: Link to CM4AI March 2025 data release circled in red
 
 #. On the newly opened page/tab, scroll down to the **cm4ai-v0.6-beta-if-images-paclitaxel.zip** entry
    and click the download icon (circled in red) to bring up a pop up dialog. Click **Zip Archive** (red arrow) to
    accept the usage agreement and download the dataset
 
     .. image:: images/0.6imagedownload_paclitaxel.png
-        :alt: CM4AI February 2025 data release paclitaxel circled in red
+        :alt: CM4AI March 2025 data release paclitaxel circled in red
 
     .. note::
 
