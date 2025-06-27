@@ -95,4 +95,12 @@ dockerbuild: ## build docker image and store in local repository
 
 dockerpush: ## push image to dockerhub
 	@cv=`grep '__version__' cellmaps_pipeline/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
-	docker push idekerlab/cellmaps_pipeline:$$cv
+	docker push cm4ai/cellmaps_pipeline:$$cv
+
+cywebdockerbuild: ## build docker image and store in local repository
+	@cv=`grep '__version__' cellmaps_pipeline/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
+	docker build -t cm4ai/cellmaps_cywebserviceapp:$$cv -f cywebdocker/Dockerfile .
+
+cywebdockerpush: ## push image to dockerhub
+	@cv=`grep '__version__' cellmaps_pipeline/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
+	docker push cm4ai/cellmaps_cywebserviceapp:$$cv
