@@ -2,6 +2,17 @@
 History
 =======
 
+1.3.0 (2025-07-22)
+-------------------
+
+* Updated dependency cellmaps_utils to `0.9.0` from `0.8.0`
+
+* Updated dependency cellmaps_image_embedding to `0.3.3` from `0.3.2`
+
+* Updated dependency cellmaps_ppi_embedding to `0.4.3` from `0.4.2`
+
+* Updated dependency cellmaps_coembedding to `1.3.1` from `1.2.2`
+
 1.2.0 (2025-05-19)
 -------------------
 * Updated dependency cellmaps_utils to `0.8.0` from `0.7.0`
