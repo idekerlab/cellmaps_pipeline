@@ -28,12 +28,12 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = ['scipy<1.13.0',
-                'cellmaps_utils==0.8.0',
+                'cellmaps_utils==0.9.0',
                 'cellmaps_imagedownloader == 0.3.0',
                 'cellmaps_ppidownloader == 0.2.2',
-                'cellmaps_image_embedding == 0.3.2',
-                'cellmaps_ppi_embedding == 0.4.2',
-                'cellmaps_coembedding == 1.2.2',
+                'cellmaps_image_embedding == 0.3.3',
+                'cellmaps_ppi_embedding == 0.4.3',
+                'cellmaps_coembedding == 1.3.1',
                 'cellmaps_generate_hierarchy == 0.2.4',
                 'cellmaps_hierarchyeval == 0.2.2',
                 'networkx>=2.8,<2.9',
