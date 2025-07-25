@@ -155,6 +155,13 @@ Via Docker
 
    Coming soon...
 
+Cite
+-------
+
+If you find this tool useful, please cite:
+
+Lenkiewicz, J., Churas, C., Hu, M., Qian, G., Jain, M., Levinson, M. A., ... & Schaffer, L. V. (2025). Cell Mapping Toolkit: An end-to-end pipeline for mapping subcellular organization. Bioinformatics, 41(6), btaf205.
+
 Credits
 -------
 
