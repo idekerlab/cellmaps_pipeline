@@ -120,10 +120,20 @@ def network_from_embedding_mode(embedding=None, algorithm='cosine',
     edgelist_cutoff = edgelist.iloc[0:math.ceil(cutoff * len(edgelist))]
 
     new_net = CX2Network()
-    new_net.add_network_attribute(key="name", value="fake network")
-    node_id1 = new_net.add_node(attributes={"name": "node1"})
-    node_id2 = new_net.add_node(attributes={"name": "node2"})
-    new_net.add_edge(source=node_id1, target=node_id2)
+    new_net.add_network_attribute('name', f'Network from {os.path.basename(embedding)}')
+    new_net.add_network_attribute('description', f'Created using {algorithm} similarity with top {cutoff:.0%} edges')
+
+    node_to_id = {}
+    for node in pd.unique(edgelist_cutoff[[constants.PPI_EDGELIST_GENEA_COL,
+                                           constants.PPI_EDGELIST_GENEB_COL]].values.ravel()):
+        node_to_id[node] = new_net.add_node(attributes={'name': node})
+
+    for _, row in edgelist_cutoff.iterrows():
+        src = node_to_id[row[constants.PPI_EDGELIST_GENEA_COL]]
+        tgt = node_to_id[row[constants.PPI_EDGELIST_GENEB_COL]]
+        weight = row[constants.WEIGHTED_PPI_EDGELIST_WEIGHT_COL]
+        new_net.add_edge(source=src, target=tgt, attributes={'weight': weight})
+
     return [new_net.to_cx2()]
 
 def main(args):
