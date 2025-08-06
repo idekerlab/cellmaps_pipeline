@@ -2,6 +2,15 @@
 History
 =======
 
+1.4.0 (TBD)
+-------------------
+
+* implementation of networkfromebedding cytoscape web service app that takes the embedding file and outputs
+  a CX2Network wrapped in the result json structure for cytoscape web apps.
+
+* implementation of communitydetection cytoscape web service app that takes a CX2Network as input from the service app,
+  runs hidef community detection with multiple ppi cutoffs
+
 1.3.0 (2025-07-22)
 -------------------
 
