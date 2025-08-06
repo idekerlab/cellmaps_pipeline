@@ -60,6 +60,27 @@ def _parse_arguments(desc, args):
                              '0.1 means keep top 10 percent')
     parser.add_argument('--interactome_uuid',
                         help='UUID of input NDEx network hierarchy')
+    parser.add_argument('--ppi_cutoffs', nargs='+', type=float,
+                        default=CosineSimilarityPPIGenerator.PPI_CUTOFFS,
+                        help='Cutoffs used to generate PPI input networks. For example, '
+                             'a value of 0.1 means to generate PPI input network using the '
+                             'top ten percent of edges in interactome. Each cutoff generates '
+                             'another PPI network')
+    parser.add_argument('--k', default=CellmapsGenerateHierarchy.K_DEFAULT, type=int,
+                        help='HiDeF stability parameter')
+    parser.add_argument('--hidef_algorithm', default=CellmapsGenerateHierarchy.ALGORITHM,
+                        help='HiDeF clustering algorithm parameter')
+    parser.add_argument('--maxres', default=CellmapsGenerateHierarchy.MAXRES, type=float,
+                        help='HiDeF max resolution parameter')
+    parser.add_argument('--containment_threshold', default=HiDeFHierarchyRefiner.CONTAINMENT_THRESHOLD, type=float,
+                        help='Containment index threshold for pruning hierarchy')
+    parser.add_argument('--jaccard_threshold', default=HiDeFHierarchyRefiner.JACCARD_THRESHOLD, type=float,
+                        help='Jaccard index threshold for merging similar clusters')
+    parser.add_argument('--min_diff', default=HiDeFHierarchyRefiner.MIN_DIFF, type=float,
+                        help='Minimum difference in number of proteins for every '
+                             'parent-child pair')
+    parser.add_argument('--min_system_size', default=HiDeFHierarchyRefiner.MIN_SYSTEM_SIZE, type=float,
+                        help='Minimum number of proteins each system must have to be kept')
     parser.add_argument('--tempdir', default='/tmp',
                         help='Directory needed to hold files temporarily for processing')
     parser.add_argument('--logconf', default=None,
@@ -149,7 +170,7 @@ def network_from_embedding_mode(embedding=None, algorithm='cosine',
 
 
 def community_detection_mode(interactome, ndex_uuid, ppi_cutoffs=CosineSimilarityPPIGenerator.PPI_CUTOFFS,
-                             algorithm=CellmapsGenerateHierarchy.ALGORITHM,maxres=CellmapsGenerateHierarchy.MAXRES,
+                             algorithm=CellmapsGenerateHierarchy.ALGORITHM, maxres=CellmapsGenerateHierarchy.MAXRES,
                              k=CellmapsGenerateHierarchy.K_DEFAULT,
                              containment_threshold=HiDeFHierarchyRefiner.CONTAINMENT_THRESHOLD,
                              jaccard_threshold=HiDeFHierarchyRefiner.JACCARD_THRESHOLD,
@@ -169,7 +190,7 @@ def community_detection_mode(interactome, ndex_uuid, ppi_cutoffs=CosineSimilarit
     df = df.sort_values(weight_col, ascending=False)
     edgelist_files = []
     for cutoff in ppi_cutoffs:
-        top_df = df.iloc[:int(len(df) * cutoff)]
+        top_df = df.iloc[:int(len(df) * cutoff)+1]
         path = os.path.join(tmpdir, f'ppi_{cutoff}.id.edgelist.tsv')
         top_df[['source_id', 'target_id']].to_csv(path, sep='\t', index=False, header=False)
         edgelist_files.append(path)
@@ -246,10 +267,14 @@ For more information visit https://cellmaps-pipeline.readthedocs.io
             result = [{'action': 'addNetworks',
                        'data': community_detection_mode(interactome=theargs.input,
                                                         ndex_uuid=theargs.interactome_uuid,
-                                                        ppi_cutoffs=CosineSimilarityPPIGenerator.PPI_CUTOFFS,
-                                                        algorithm=CellmapsGenerateHierarchy.ALGORITHM,
-                                                        maxres=CellmapsGenerateHierarchy.MAXRES,
-                                                        k=CellmapsGenerateHierarchy.K_DEFAULT)}]
+                                                        ppi_cutoffs=theargs.ppi_cutoffs,
+                                                        algorithm=theargs.hidef_algorithm,
+                                                        maxres=theargs.maxres,
+                                                        k=theargs.k,
+                                                        containment_threshold=theargs.containment_threshold,
+                                                        jaccard_threshold=theargs.jaccard_threshold,
+                                                        min_system_size=theargs.min_system_size,
+                                                        min_diff=theargs.min_diff)}]
         json.dump(result, sys.stdout, indent=2)
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
