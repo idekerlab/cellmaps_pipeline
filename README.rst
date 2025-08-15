@@ -16,6 +16,7 @@ The Cell Maps Pipeline is part of the Cell Mapping Toolkit
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
+* Literature: https://doi.org/10.1093/bioinformatics/btaf205
 * Source code: https://github.com/idekerlab/cellmaps_pipeline
 
 Dependencies
