@@ -16,7 +16,7 @@ The Cell Maps Pipeline is part of the Cell Mapping Toolkit
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
-* Literature: https://doi.org/10.1093/bioinformatics/btaf205
+* Literature: https://doi.org/10.1093/bioinformatics/btaf205 
 * Source code: https://github.com/idekerlab/cellmaps_pipeline
 
 Dependencies
@@ -161,7 +161,7 @@ Cite
 
 If you find this tool useful, please cite:
 
-Lenkiewicz, J., Churas, C., Hu, M., Qian, G., Jain, M., Levinson, M. A., ... & Schaffer, L. V. (2025). Cell Mapping Toolkit: An end-to-end pipeline for mapping subcellular organization. Bioinformatics, 41(6), btaf205.
+Lenkiewicz, J., Churas, C., Hu, M., Qian, G., Jain, M., Levinson, M. A., ... & Schaffer, L. V. (2025). Cell Mapping Toolkit: An end-to-end pipeline for mapping subcellular organization. Bioinformatics, 41(6), btaf205, https://doi.org/10.1093/bioinformatics/btaf205.
 
 Credits
 -------
