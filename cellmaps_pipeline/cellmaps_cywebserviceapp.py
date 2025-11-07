@@ -185,9 +185,8 @@ def community_detection_mode(interactome, ndex_uuid, ppi_cutoffs=CosineSimilarit
     pandas_cx2_factory = CX2NetworkPandasDataFrameFactory()
     df = pandas_cx2_factory.get_dataframe(parent_cx2)
     weight_col = next((col for col in df.columns if col.lower() == 'weight'), None)
-    if weight_col is None:
-        raise ValueError("No 'weight' column found (case-insensitive)")
-    df = df.sort_values(weight_col, ascending=False)
+    if weight_col:
+        df = df.sort_values(weight_col, ascending=False)
     edgelist_files = []
     for cutoff in ppi_cutoffs:
         top_df = df.iloc[:int(len(df) * cutoff)+1]
@@ -197,14 +196,23 @@ def community_detection_mode(interactome, ndex_uuid, ppi_cutoffs=CosineSimilarit
 
     outputprefix = os.path.join(tmpdir, CDAPSHiDeFHierarchyGenerator.HIDEF_OUT_PREFIX)
     hier_generator = CDAPSHiDeFHierarchyGenerator()
-    hier_generator._run_hidef(edgelist_files, outputprefix, algorithm, maxres, k)
+
+    try:   
+        hier_generator._run_hidef(edgelist_files, outputprefix, algorithm, maxres, k)
+    except Exception as e:
+        print('HiDeF failed: ' + str(e))
+        raise
 
     refiner = HiDeFHierarchyRefiner(ci_thre=containment_threshold,
                                     ji_thre=jaccard_threshold,
                                     min_term_size=min_system_size,
                                     min_diff=min_diff)
 
-    refiner.refine_hierarchy(outprefix=outputprefix)
+    try:
+        refiner.refine_hierarchy(outprefix=outputprefix)
+    except Exception as e:
+        print('Hierarchy refinement failed: ' + str(e))
+        raise
 
     cdaps_out_file = os.path.join(tmpdir,
                                   CDAPSHiDeFHierarchyGenerator.CDAPS_JSON_FILE)
