@@ -16,22 +16,23 @@ The Cell Maps Pipeline is part of the Cell Mapping Toolkit
 
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
+* Literature: https://doi.org/10.1093/bioinformatics/btaf205 
 * Source code: https://github.com/idekerlab/cellmaps_pipeline
 
 Dependencies
 ------------
 
-* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__ (v. 0.8.0)
-* `cellmaps_imagedownloader <https://pypi.org/project/cellmaps-imagedownloader>`__ (v. 0.3.0)
-* `cellmaps_ppidownloader <https://pypi.org/project/cellmaps-ppidownloader>`__ (v. 0.2.2)
-* `cellmaps_image_embedding <https://pypi.org/project/cellmaps-image-embedding>`__ (v. 0.3.2)
-* `cellmaps_ppi_embedding <https://pypi.org/project/cellmaps-ppi-embedding/>`__ (v. 0.4.2)
-* `cellmaps_coembedding <https://pypi.org/project/cellmaps-coembedding>`__ (v. 1.2.2)
-* `cellmaps_generate_hierarchy <https://pypi.org/project/cellmaps-generate-hierarchy>`__ (v. 0.2.4)
-* `cellmaps_hierarchyeval <https://pypi.org/project/cellmaps-hierarchyeval>`__ (v. 0.2.2)
-* `networkx <https://pypi.org/project/networkx>`__ (v. >=2.8,<2.9)
-* `scipy <https://pypi.org/project/scipy>`__ (v. <1.13.0)
-* `tqdm <https://pypi.org/project/tqdm>`__ (v. >=4.66.0,<5.0.0)
+* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__
+* `cellmaps_imagedownloader <https://pypi.org/project/cellmaps-imagedownloader>`__ 
+* `cellmaps_ppidownloader <https://pypi.org/project/cellmaps-ppidownloader>`__ 
+* `cellmaps_image_embedding <https://pypi.org/project/cellmaps-image-embedding>`__ 
+* `cellmaps_ppi_embedding <https://pypi.org/project/cellmaps-ppi-embedding/>`__ 
+* `cellmaps_coembedding <https://pypi.org/project/cellmaps-coembedding>`__ 
+* `cellmaps_generate_hierarchy <https://pypi.org/project/cellmaps-generate-hierarchy>`__ 
+* `cellmaps_hierarchyeval <https://pypi.org/project/cellmaps-hierarchyeval>`__ 
+* `networkx <https://pypi.org/project/networkx>`__ 
+* `scipy <https://pypi.org/project/scipy>`__ 
+* `tqdm <https://pypi.org/project/tqdm>`__ 
 
 Compatibility
 -------------
@@ -154,6 +155,13 @@ Via Docker
 .. code-block::
 
    Coming soon...
+
+Cite
+-------
+
+If you find this tool useful, please cite:
+
+Lenkiewicz, J., Churas, C., Hu, M., Qian, G., Jain, M., Levinson, M. A., ... & Schaffer, L. V. (2025). Cell Mapping Toolkit: An end-to-end pipeline for mapping subcellular organization. Bioinformatics, 41(6), btaf205, https://doi.org/10.1093/bioinformatics/btaf205.
 
 Credits
 -------
