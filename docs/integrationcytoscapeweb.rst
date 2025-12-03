@@ -23,6 +23,11 @@ within Cytoscape Web.
 This `Cytoscape Web Service App`_ takes a Network, clusters it at 
 multiple resolutions to generate a hierarchy describing those communities.
 
+.. note::
+
+   This is a new App and is still under active development. 
+   Please report any issues `Here <https://github.com/idekerlab/cellmaps_pipeline/issues>`__
+
 1. In `Cytoscape Web`_ open the context menu, click **Apps**, then choose
    **Manage Apps**.
    
@@ -76,6 +81,12 @@ multiple resolutions to generate a hierarchy describing those communities.
    .. image:: ./images/cd6.png
       :align: center
       :alt: Cytoscape Web showing the resulting hierarchy from the Cell Mapping Toolkit Community Detection app
+
+   .. note::
+
+      Be sure to save your network in `Cytoscape Web`_ if you want to keep the results by logging into your 
+      account (via login icon in upper right corner) and using the **Data -> Save Network to NDEx** menu option.
+
 
 .. _Cytoscape Web: https://web.cytoscape.org/
 .. _Cytoscape Web Service App: https://cytoscape-web.readthedocs.io/en/latest/Extending.html#service-apps
