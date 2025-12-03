@@ -4,24 +4,38 @@
 Integration with Cytoscape Web
 ========================================
 
-Cytoscape Web Community Detection
-==================================
+`Cytoscape Web`_ is a web-based network visualization and analysis 
+tool built on modern web technologies. It allows users to visualize, 
+analyze, and share complex networks directly within their web 
+browsers without the need for installing any software. 
 
-Community detection groups nodes that are more densely connected to each other
-than to the rest of a network. The Cell Mapping Toolkit Community Detection app
-takes a Networks, clusters it, and generates a hierarchy describing those communities.
-Cytoscape Web *service app* makes this possible inside the browser by a small external program
-that Cytoscape Web calls with the current network and that returns the resulting hierarchy.
+The Cell Mapping Toolkit is using the `Cytoscape Web Service App`_ framework 
+to expose the individual steps of the pipeline through `Cytoscape Web`_.
 
-1. In Cytoscape on the web open the context menu, click **Apps**, then choose
+
+Cytoscape Web Community Detection aka Hierarchy Generation App
+================================================================
+
+This section walks you through the steps to integrate and use the 
+Cell Mapping Toolkit Community Detection aka Hierarchy Generation step/tool 
+within Cytoscape Web.
+
+This `Cytoscape Web Service App`_ takes a Network, clusters it at 
+multiple resolutions to generate a hierarchy describing those communities.
+
+1. In `Cytoscape Web`_ open the context menu, click **Apps**, then choose
    **Manage Apps**.
    
    .. image:: ./images/cd1.png
       :align: center
       :alt: Cytoscape Web Apps menu for managing external services
 
-2. Paste ``https://cd.ndexbio.org/cy/cytocontainer/v1/cellmappingtoolkitcommunitydetection`` into the
+2. Paste the URL below into the
    **Enter new external service URL** input box and click **Add**.
+
+   .. code-block:: text
+
+      https://cd.ndexbio.org/cy/cytocontainer/v1/cellmappingtoolkitcommunitydetection
 
    .. image:: ./images/cd2.png
       :align: center
@@ -49,12 +63,20 @@ that Cytoscape Web calls with the current network and that returns the resulting
       :align: center
       :alt: Cytoscape Web dialog for the Cell Mapping Toolkit Community Detection app showing the NDEx UUID input field
 
+
+   .. note::
+
+      If an invalid UUID is provided, the hierarchy will still be generated, but no interaction network
+      will be displayed in the subnetwork viewer when clicking on the communities/assemblies on the left panel.
+
 6. Click **Submit** to start the analysis. The app runs community detection on
    the selected network and, once finished, returns the generated hierarchy to
-   Cytoscape on the web.
+   `Cytoscape Web`_. 
 
    .. image:: ./images/cd6.png
       :align: center
       :alt: Cytoscape Web showing the resulting hierarchy from the Cell Mapping Toolkit Community Detection app
 
 .. _Cytoscape Web: https://web.cytoscape.org/
+.. _Cytoscape Web Service App: https://cytoscape-web.readthedocs.io/en/latest/Extending.html#service-apps
+
