@@ -14,6 +14,11 @@ The Cell Maps Pipeline is part of the Cell Mapping Toolkit
         :target: https://cellmaps-pipeline.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.16337064.svg
+        :target: https://zenodo.org/doi/10.5281/zenodo.16337064
+        :alt: Zenodo DOI badge
+
+
 * Free software: MIT license
 * Documentation: https://cellmaps-pipeline.readthedocs.io.
 * Literature: https://doi.org/10.1093/bioinformatics/btaf205 
