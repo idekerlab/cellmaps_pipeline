@@ -2,7 +2,7 @@
 History
 =======
 
-1.4.0 (TBD)
+1.4.0 (2026-07-27)
 -------------------
 
 * implementation of networkfromebedding cytoscape web service app that takes the embedding file and outputs
@@ -10,6 +10,10 @@ History
 
 * implementation of communitydetection cytoscape web service app that takes a CX2Network as input from the service app,
   runs hidef community detection with multiple ppi cutoffs
+
+* Updated dependency cellmaps_coembedding to `1.6.0` from `1.2.2`
+
+* Updated dependency cellmaps_generate_hierarchy to `0.3.0.post1` from `0.2.4`
 
 1.3.0 (2025-07-22)
 -------------------
